@@ -1,55 +1,43 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const authRoutes = require("./routes/auth");
-const messageRoutes = require("./routes/messages");
-const app = express();
-const socket = require("socket.io");
-require("dotenv").config();
+/**
+ * ConnectX Server Entrypoint
+ * Loads validated configuration, establishes database connection, and boots HTTP + WebSockets.
+ */
+const http = require("http");
+const app = require("./app");
+const config = require("./config/env");
+const { connectDatabase } = require("./config/database");
+const { initSocketGateway } = require("./realtime/socketGateway");
 
-app.use(cors());
-app.use(express.json());
+async function startServer() {
+  // 1. Establish resilient Database Connection
+  await connectDatabase();
 
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("DB Connetion Successfull");
-  })
-  .catch((err) => {
-    console.log(err.message);
+  // 2. Create HTTP Server wrapping Express app
+  const server = http.createServer(app);
+
+  // 3. Initialize Socket.IO Gateway
+  initSocketGateway(server);
+
+  // 4. Start Listening on Configured Port
+  server.listen(config.port, () => {
+    console.log(`🚀 ConnectX Server listening on port ${config.port} (${config.nodeEnv})`);
+    console.log(`🩺 Health check accessible at http://localhost:${config.port}/health`);
   });
 
-app.get("/ping", (_req, res) => {
-  return res.json({ msg: "Ping Successful" });
-});
+  // Graceful shutdown handling
+  const shutdown = () => {
+    console.log("🛑 Gracefully shutting down ConnectX server...");
+    server.close(() => {
+      console.log("👋 HTTP server closed.");
+      process.exit(0);
+    });
+  };
 
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+}
 
-const server = app.listen(process.env.PORT, () =>
-  console.log(`Server started on ${process.env.PORT}`)
-);
-const io = socket(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    credentials: true,
-  },
-});
-
-global.onlineUsers = new Map();
-io.on("connection", (socket) => {
-  global.chatSocket = socket;
-  socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
-  });
-
-  socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
-    }
-  });
+startServer().catch((err) => {
+  console.error("❌ Fatal Error during server bootstrap:", err);
+  process.exit(1);
 });
