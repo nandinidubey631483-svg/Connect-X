@@ -5,7 +5,7 @@ import ContactsView from "../contacts/ContactsView";
 import SettingsView from "../settings/SettingsView";
 import ProfileView from "../profile/ProfileView";
 import NotificationsView from "../notifications/NotificationsView";
-import CallHistoryModal from "../calling/CallHistoryModal";
+import CallsView from "../calling/CallsView";
 import Logout from "../Logout";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import { useTheme } from "../../context/ThemeContext";
@@ -40,7 +40,6 @@ export default function MainLayout({
   const navigate = useNavigate();
 
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isCallHistoryOpen, setIsCallHistoryOpen] = useState(false);
 
   // Load unread count on mount
   useEffect(() => {
@@ -84,6 +83,7 @@ export default function MainLayout({
   const getTabFromPath = useCallback(() => {
     const path = location.pathname;
     if (path === "/contacts" || path === "/people") return "people";
+    if (path === "/calls") return "calls";
     if (path === "/notifications") return "notifications";
     if (path === "/settings") return "settings";
     if (path === "/profile") return "profile";
@@ -100,6 +100,7 @@ export default function MainLayout({
     setActiveRailTab(tab);
     if (tab === "chats") navigate("/");
     else if (tab === "people") navigate("/contacts");
+    else if (tab === "calls") navigate("/calls");
     else if (tab === "notifications") navigate("/notifications");
     else if (tab === "settings") navigate("/settings");
     else if (tab === "profile") navigate("/profile");
@@ -256,12 +257,12 @@ export default function MainLayout({
               )}
             </button>
 
-            {/* Call History Button */}
+            {/* Calls Navigation Button */}
             <button
               type="button"
-              className="nb"
-              onClick={() => setIsCallHistoryOpen(true)}
-              title="Call History"
+              className={`nb ${activeRailTab === "calls" ? "on" : ""}`}
+              onClick={() => handleTabChange("calls")}
+              title="Calls"
               data-testid="header-call-history-btn"
               style={{
                 width: "44px",
@@ -269,8 +270,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: isCallHistoryOpen ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: isCallHistoryOpen ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "calls" ? "var(--acc2, #EEEDFD)" : "transparent",
+                color: activeRailTab === "calls" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -278,6 +279,19 @@ export default function MainLayout({
               }}
             >
               <FiPhone size={20} />
+              {activeRailTab === "calls" && (
+                <span
+                  className="pip"
+                  style={{
+                    position: "absolute",
+                    left: "-12px",
+                    width: "4px",
+                    height: "20px",
+                    borderRadius: "0 4px 4px 0",
+                    background: "var(--acc, #4F46E5)",
+                  }}
+                />
+              )}
             </button>
 
             {/* Notifications Navigation Button */}
@@ -324,7 +338,11 @@ export default function MainLayout({
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
-              {activeRailTab === "notifications" && (
+              {activeRailTab === "calls" && (
+            <CallsView onBack={() => handleTabChange("chats")} socket={socket} />
+          )}
+
+          {activeRailTab === "notifications" && (
                 <span
                   className="pip"
                   style={{
@@ -510,6 +528,10 @@ export default function MainLayout({
             />
           )}
 
+          {activeRailTab === "calls" && (
+            <CallsView onBack={() => handleTabChange("chats")} socket={socket} />
+          )}
+
           {activeRailTab === "notifications" && (
             <NotificationsView
               onBack={() => handleTabChange("chats")}
@@ -582,9 +604,9 @@ export default function MainLayout({
           </button>
           <button
             type="button"
-            className="nb"
-            onClick={() => setIsCallHistoryOpen(true)}
-            title="Call History"
+            className={`nb ${activeRailTab === "calls" ? "on" : ""}`}
+            onClick={() => handleTabChange("calls")}
+            title="Calls"
           >
             <FiPhone size={20} />
           </button>
@@ -627,12 +649,6 @@ export default function MainLayout({
           </button>
         </nav>
       )}
-      {/* Call History Modal */}
-      <CallHistoryModal
-        isOpen={isCallHistoryOpen}
-        onClose={() => setIsCallHistoryOpen(false)}
-        socket={socket}
-      />
     </div>
   );
 }

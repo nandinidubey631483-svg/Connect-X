@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { allUsersRoute, host } from "../utils/APIRoutes";
+import { host } from "../utils/APIRoutes";
 import {
   v1ContactsRoute,
   v1ConversationsRoute,

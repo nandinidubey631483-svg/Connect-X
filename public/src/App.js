@@ -71,6 +71,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/calls"
+                element={
+                  <ProtectedRoute>
+                    <Chat initialTab="calls" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/notifications"
                 element={
                   <ProtectedRoute>
