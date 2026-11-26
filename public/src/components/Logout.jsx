@@ -2,22 +2,23 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BiPowerOff } from "react-icons/bi";
 import styled from "styled-components";
-import axios from "axios";
-import { logoutRoute } from "../utils/APIRoutes";
+import { useAuth } from "../hooks/useAuth";
+import { theme } from "../styles/theme";
+
 export default function Logout() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const handleClick = async () => {
-    const id = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-    )._id;
-    const data = await axios.get(`${logoutRoute}/${id}`);
-    if (data.status === 200) {
-      localStorage.clear();
+    try {
+      await logout();
+    } finally {
       navigate("/login");
     }
   };
+
   return (
-    <Button onClick={handleClick}>
+    <Button onClick={handleClick} title="Log Out" data-testid="logout-button">
       <BiPowerOff />
     </Button>
   );
@@ -28,12 +29,20 @@ const Button = styled.button`
   justify-content: center;
   align-items: center;
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  background-color: #9a86f3;
-  border: none;
+  border-radius: ${theme.borderRadius.md};
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: ${theme.colors.textSecondary};
   cursor: pointer;
+  transition: ${theme.transitions.default};
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: ${theme.colors.danger};
+  }
+
   svg {
-    font-size: 1.3rem;
-    color: #ebe7ff;
+    font-size: 1.25rem;
   }
 `;

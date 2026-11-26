@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import styled from "styled-components";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { loginRoute } from "../utils/APIRoutes";
+import { useAuth } from "../hooks/useAuth";
+import AuthHero from "../components/auth/AuthHero";
+import CaptchaShield from "../components/auth/CaptchaShield";
+import LogoImg from "../assets/connectx-logo.png";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [values, setValues] = useState({ username: "", password: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
+
   const toastOptions = {
     position: "bottom-right",
-    autoClose: 8000,
+    autoClose: 5000,
     pauseOnHover: true,
     draggable: true,
     theme: "dark",
   };
-  useEffect(() => {
-    if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
-      navigate("/");
-    }
-  }, []);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -29,11 +28,11 @@ export default function Login() {
 
   const validateForm = () => {
     const { username, password } = values;
-    if (username === "") {
-      toast.error("Email and Password is required.", toastOptions);
+    if (username.trim() === "") {
+      toast.error("Username is required.", toastOptions);
       return false;
     } else if (password === "") {
-      toast.error("Email and Password is required.", toastOptions);
+      toast.error("Password is required.", toastOptions);
       return false;
     }
     return true;
@@ -41,123 +40,117 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (validateForm()) {
-      const { username, password } = values;
-      const { data } = await axios.post(loginRoute, {
-        username,
-        password,
-      });
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
+    if (!validateForm() || isSubmitting) return;
 
-        navigate("/");
-      }
+    setIsSubmitting(true);
+    try {
+      const { username, password } = values;
+      await login(username, password);
+      navigate("/");
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error?.message ||
+        err.response?.data?.msg ||
+        err.message ||
+        "Login failed. Please check your credentials.";
+      toast.error(errorMessage, toastOptions);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      <FormContainer>
-        <form action="" onSubmit={(event) => handleSubmit(event)}>
-          <div className="brand">
-            <img src={Logo} alt="logo" />
-            <h1>snappy</h1>
+      <div id="auth">
+        <AuthHero />
+
+        <div className="formside">
+          <div className="form st">
+            <div className="brand" style={{ marginBottom: "20px" }}>
+              <img src={LogoImg} alt="ConnectX Logo" className="lg2" style={{ height: "32px", width: "auto" }} />
+              <span className="wm">
+                Connect<i>X</i>
+              </span>
+            </div>
+
+            <h2 className="serif">Welcome back</h2>
+            <p className="mut" style={{ marginTop: "4px" }}>
+              Sign in to continue to your conversations.
+            </p>
+
+            <div className="seg">
+              <button type="button" className="on">
+                Sign In
+              </button>
+              <button type="button" onClick={() => navigate("/register")}>
+                Sign Up
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} data-testid="login-form">
+              <div className="fld">
+                <label>Username</label>
+                <input
+                  type="text"
+                  className="in"
+                  placeholder="Username"
+                  name="username"
+                  value={values.username}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  autoComplete="username"
+                  data-testid="login-username"
+                />
+              </div>
+
+              <div className="fld">
+                <label>Password</label>
+                <input
+                  type="password"
+                  className="in"
+                  placeholder="Password"
+                  name="password"
+                  value={values.password}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  autoComplete="current-password"
+                  data-testid="login-password"
+                />
+              </div>
+
+              <CaptchaShield
+                isVerified={isCaptchaVerified}
+                onVerify={() => setIsCaptchaVerified(true)}
+                disabled={isSubmitting}
+              />
+
+              <button
+                type="submit"
+                className="btn p w"
+                disabled={isSubmitting}
+                style={{ marginTop: "8px" }}
+                data-testid="login-submit"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spin"></span> Signing in...
+                  </>
+                ) : (
+                  "Log In"
+                )}
+              </button>
+
+              <p className="sm mut" style={{ textAlign: "center", marginTop: "18px" }}>
+                Don't have an account?{" "}
+                <Link to="/register" className="lnk" style={{ color: "var(--acc)", textDecoration: "none" }}>
+                  Sign up now
+                </Link>
+              </p>
+            </form>
           </div>
-          <input
-            type="text"
-            placeholder="Username"
-            name="username"
-            onChange={(e) => handleChange(e)}
-            min="3"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            onChange={(e) => handleChange(e)}
-          />
-          <button type="submit">Log In</button>
-          <span>
-            Don't have an account ? <Link to="/register">Create One.</Link>
-          </span>
-        </form>
-      </FormContainer>
+        </div>
+      </div>
       <ToastContainer />
     </>
   );
 }
-
-const FormContainer = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  align-items: center;
-  background-color: #131324;
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-    img {
-      height: 5rem;
-    }
-    h1 {
-      color: white;
-      text-transform: uppercase;
-    }
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    background-color: #00000076;
-    border-radius: 2rem;
-    padding: 5rem;
-  }
-  input {
-    background-color: transparent;
-    padding: 1rem;
-    border: 0.1rem solid #4e0eff;
-    border-radius: 0.4rem;
-    color: white;
-    width: 100%;
-    font-size: 1rem;
-    &:focus {
-      border: 0.1rem solid #997af0;
-      outline: none;
-    }
-  }
-  button {
-    background-color: #4e0eff;
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 0.4rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    &:hover {
-      background-color: #4e0eff;
-    }
-  }
-  span {
-    color: white;
-    text-transform: uppercase;
-    a {
-      color: #4e0eff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  }
-`;
