@@ -31,6 +31,28 @@ export default class ErrorBoundary extends Component {
             <p>
               ConnectX encountered an unexpected client error. Please reload the application.
             </p>
+            {this.state.error && (
+              <pre
+                style={{
+                  background: "rgba(0,0,0,0.06)",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  maxWidth: "500px",
+                  maxHeight: "150px",
+                  overflow: "auto",
+                  textAlign: "left",
+                  color: "#d93838",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  margin: "12px 0",
+                }}
+              >
+                {this.state.error.toString()}
+                {"\n"}
+                {this.state.error.stack}
+              </pre>
+            )}
             <Button variant="primary" onClick={this.handleReload}>
               Reload Application
             </Button>

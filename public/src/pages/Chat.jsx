@@ -13,6 +13,8 @@ import { getAccessToken, setAccessToken } from "../services/tokenManager";
 import ChatContainer from "../components/ChatContainer";
 import Welcome from "../components/Welcome";
 import MainLayout from "../components/layout/MainLayout";
+import { CallProvider } from "../context/CallContext";
+import CallModal from "../components/calling/CallModal";
 
 export default function Chat({ initialTab }) {
   const navigate = useNavigate();
@@ -205,21 +207,24 @@ export default function Chat({ initialTab }) {
   };
 
   return (
-    <MainLayout
-      currentUser={currentUser}
-      currentChat={currentChat}
-      contacts={contacts}
-      onSelectChat={handleChatChange}
-      onBackToSidebar={handleBackToSidebar}
-      onContactsUpdated={loadContacts}
-      socket={socket}
-      initialTab={initialTab}
-    >
-      {currentChat === undefined ? (
-        <Welcome />
-      ) : (
-        <ChatContainer currentChat={currentChat} socket={socket} />
-      )}
-    </MainLayout>
+    <CallProvider currentSocket={socket}>
+      <MainLayout
+        currentUser={currentUser}
+        currentChat={currentChat}
+        contacts={contacts}
+        onSelectChat={handleChatChange}
+        onBackToSidebar={handleBackToSidebar}
+        onContactsUpdated={loadContacts}
+        socket={socket}
+        initialTab={initialTab}
+      >
+        {currentChat === undefined ? (
+          <Welcome />
+        ) : (
+          <ChatContainer currentChat={currentChat} socket={socket} />
+        )}
+      </MainLayout>
+      <CallModal socket={socket} />
+    </CallProvider>
   );
 }

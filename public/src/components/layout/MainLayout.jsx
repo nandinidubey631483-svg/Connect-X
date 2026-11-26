@@ -5,6 +5,7 @@ import ContactsView from "../contacts/ContactsView";
 import SettingsView from "../settings/SettingsView";
 import ProfileView from "../profile/ProfileView";
 import NotificationsView from "../notifications/NotificationsView";
+import CallHistoryModal from "../calling/CallHistoryModal";
 import Logout from "../Logout";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import { useTheme } from "../../context/ThemeContext";
@@ -15,6 +16,7 @@ import DoodleBg from "../../assets/doodle_pattern.svg";
 import {
   FiMessageSquare,
   FiUserPlus,
+  FiPhone,
   FiBell,
   FiSettings,
   FiMoon,
@@ -38,6 +40,7 @@ export default function MainLayout({
   const navigate = useNavigate();
 
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isCallHistoryOpen, setIsCallHistoryOpen] = useState(false);
 
   // Load unread count on mount
   useEffect(() => {
@@ -251,6 +254,30 @@ export default function MainLayout({
                   }}
                 />
               )}
+            </button>
+
+            {/* Call History Button */}
+            <button
+              type="button"
+              className="nb"
+              onClick={() => setIsCallHistoryOpen(true)}
+              title="Call History"
+              data-testid="header-call-history-btn"
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                display: "grid",
+                placeItems: "center",
+                background: isCallHistoryOpen ? "var(--acc2, #EEEDFD)" : "transparent",
+                color: isCallHistoryOpen ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                position: "relative",
+                transition: "0.15s",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <FiPhone size={20} />
             </button>
 
             {/* Notifications Navigation Button */}
@@ -555,6 +582,14 @@ export default function MainLayout({
           </button>
           <button
             type="button"
+            className="nb"
+            onClick={() => setIsCallHistoryOpen(true)}
+            title="Call History"
+          >
+            <FiPhone size={20} />
+          </button>
+          <button
+            type="button"
             className={`nb ${activeRailTab === "notifications" ? "on" : ""}`}
             onClick={() => handleTabChange("notifications")}
             title="Notifications"
@@ -592,6 +627,12 @@ export default function MainLayout({
           </button>
         </nav>
       )}
+      {/* Call History Modal */}
+      <CallHistoryModal
+        isOpen={isCallHistoryOpen}
+        onClose={() => setIsCallHistoryOpen(false)}
+        socket={socket}
+      />
     </div>
   );
 }

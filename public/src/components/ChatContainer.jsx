@@ -13,6 +13,7 @@ import {
 import apiClient from "../services/apiClient";
 import Avatar from "./common/Avatar";
 import DoodleBg from "../assets/doodle_pattern.svg";
+import { useCall } from "../context/CallContext";
 import {
   FiDownload,
   FiFileText,
@@ -28,6 +29,7 @@ import {
 } from "react-icons/fi";
 
 export default function ChatContainer({ currentChat, socket, onBackToSidebar }) {
+  const { startVoiceCall, startVideoCall } = useCall();
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -516,10 +518,24 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <button type="button" className="btn ic" title="Audio call" style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)" }}>
+            <button
+              type="button"
+              className="btn ic"
+              title="Voice call"
+              data-testid="header-voice-call-btn"
+              onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket)}
+              style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
+            >
               <FiPhone size={16} />
             </button>
-            <button type="button" className="btn ic" title="Video call" style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)" }}>
+            <button
+              type="button"
+              className="btn ic"
+              title="Video call"
+              data-testid="header-video-call-btn"
+              onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket)}
+              style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
+            >
               <FiVideo size={16} />
             </button>
             <button type="button" className="btn ic" title="Search messages" style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)" }}>
@@ -752,7 +768,9 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                 <button
                   type="button"
                   className="btn"
-                  title="Audio call"
+                  title="Voice call"
+                  data-testid="drawer-voice-call-btn"
+                  onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket)}
                   style={{
                     flex: 1,
                     height: "36px",
@@ -766,6 +784,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                     fontSize: "12px",
                     fontWeight: "500",
                     color: "var(--ink)",
+                    cursor: "pointer",
                   }}
                 >
                   <FiPhone size={14} color="var(--acc)" /> Call
@@ -774,6 +793,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                   type="button"
                   className="btn"
                   title="Video call"
+                  data-testid="drawer-video-call-btn"
+                  onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket)}
                   style={{
                     flex: 1,
                     height: "36px",
@@ -787,6 +808,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                     fontSize: "12px",
                     fontWeight: "500",
                     color: "var(--ink)",
+                    cursor: "pointer",
                   }}
                 >
                   <FiVideo size={14} color="var(--acc)" /> Video
