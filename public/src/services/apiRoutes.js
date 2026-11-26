@@ -60,6 +60,12 @@ export const v1MarkAllNotificationsReadRoute = `${v1NotificationsRoute}/read-all
 export const v1MarkNotificationReadRoute = (id) => `${v1NotificationsRoute}/${id}/read`;
 export const v1DeleteNotificationRoute = (id) => `${v1NotificationsRoute}/${id}`;
 
+// Module 11 v1 Calling Routes
+export const v1CallsRoute = `${host}/api/v1/calls`;
+export const v1CallIceServersRoute = `${v1CallsRoute}/ice-servers`;
+export const v1InitiateCallRoute = `${v1CallsRoute}/initiate`;
+export const v1CallDetailsRoute = (id) => `${v1CallsRoute}/${id}`;
+
 // Legacy Auth Routes (Preserved for backward compatibility)
 export const loginRoute = `${host}/api/auth/login`;
 export const registerRoute = `${host}/api/auth/register`;
