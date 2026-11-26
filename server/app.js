@@ -19,6 +19,7 @@ const contactsV1Routes = require("./routes/contactsV1");
 const conversationsV1Routes = require("./routes/conversationsV1");
 const messagesV1Routes = require("./routes/messagesV1");
 const notificationsV1Routes = require("./routes/notificationsV1");
+const callsV1Routes = require("./routes/callsV1");
 const messageRoutes = require("./routes/messages");
 
 const app = express();
@@ -61,6 +62,7 @@ app.use("/api/v1/contacts", contactsV1Routes);
 app.use("/api/v1/conversations", conversationsV1Routes);
 app.use("/api/v1/messages", messagesV1Routes);
 app.use("/api/v1/notifications", notificationsV1Routes);
+app.use("/api/v1/calls", callsV1Routes);
 app.use("/api/messages", messageRoutes);
 
 // Catch-all 404 & Centralized Error Handler

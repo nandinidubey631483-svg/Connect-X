@@ -24,6 +24,7 @@ const Conversation = require("../models/conversationModel");
 const UserSettings = require("../models/userSettingsModel");
 const Notification = require("../models/notificationModel");
 const { dispatchNotification } = require("../models/notificationService");
+const { registerCallSignaling } = require("./callSignaling");
 
 function initSocketGateway(server, options = {}) {
   const MessagesModel = options.messagesModel || Messages;
@@ -118,6 +119,9 @@ function initSocketGateway(server, options = {}) {
         callback(presence);
       }
     });
+
+    // Module 11: Real-Time Call Signaling Gateway
+    registerCallSignaling(io, socket, options);
 
     // Legacy event: register user socket
     // Identity Spoofing Protection: Client-supplied userId MUST match authenticated socket identity!

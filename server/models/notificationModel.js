@@ -29,6 +29,8 @@ const notificationSchema = new mongoose.Schema(
         "MESSAGE_RECEIVED",
         "CONTACT_REQUEST_RECEIVED",
         "CONTACT_REQUEST_ACCEPTED",
+        "INCOMING_CALL",
+        "MISSED_CALL",
       ],
       required: true,
       index: true,
@@ -53,6 +55,11 @@ const notificationSchema = new mongoose.Schema(
     messageId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Messages",
+      default: null,
+    },
+    callId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Call",
       default: null,
     },
     isRead: {
