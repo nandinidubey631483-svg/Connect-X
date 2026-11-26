@@ -365,7 +365,7 @@ export function CallProvider({ children, currentSocket }) {
    */
   useEffect(() => {
     const activeSock = currentSocket?.current || currentSocket;
-    if (!activeSock) return;
+    if (!activeSock || typeof activeSock.on !== "function") return;
 
     // Incoming Call
     const handleIncomingCall = (payload) => {
@@ -479,18 +479,20 @@ export function CallProvider({ children, currentSocket }) {
     activeSock.on("call:media_state", handleRemoteMediaState);
 
     return () => {
-      activeSock.off("call:incoming", handleIncomingCall);
-      activeSock.off("call:ringing", handleRinging);
-      activeSock.off("call:accepted", handleAccepted);
-      activeSock.off("call:rejected", handleRejected);
-      activeSock.off("call:cancelled", handleCancelled);
-      activeSock.off("call:busy", handleBusy);
-      activeSock.off("call:missed", handleMissed);
-      activeSock.off("call:ended", handleEnded);
-      activeSock.off("call:offer", handleRemoteOffer);
-      activeSock.off("call:answer", handleRemoteAnswer);
-      activeSock.off("call:ice_candidate", handleRemoteIceCandidate);
-      activeSock.off("call:media_state", handleRemoteMediaState);
+      if (typeof activeSock.off === "function") {
+        activeSock.off("call:incoming", handleIncomingCall);
+        activeSock.off("call:ringing", handleRinging);
+        activeSock.off("call:accepted", handleAccepted);
+        activeSock.off("call:rejected", handleRejected);
+        activeSock.off("call:cancelled", handleCancelled);
+        activeSock.off("call:busy", handleBusy);
+        activeSock.off("call:missed", handleMissed);
+        activeSock.off("call:ended", handleEnded);
+        activeSock.off("call:offer", handleRemoteOffer);
+        activeSock.off("call:answer", handleRemoteAnswer);
+        activeSock.off("call:ice_candidate", handleRemoteIceCandidate);
+        activeSock.off("call:media_state", handleRemoteMediaState);
+      }
     };
   }, [currentSocket, resetCallState]);
 
