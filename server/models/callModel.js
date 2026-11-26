@@ -92,7 +92,7 @@ const callSchema = new mongoose.Schema(
     },
     terminationReason: {
       type: String,
-      enum: TERMINATION_REASONS,
+      enum: [...TERMINATION_REASONS, null],
       default: null,
     },
     metadata: {
