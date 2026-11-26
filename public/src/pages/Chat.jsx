@@ -145,28 +145,39 @@ export default function Chat({ initialTab }) {
         let contactList = [];
         try {
           const res = await apiClient.get(v1ContactsRoute);
-          if (res.data && res.data.success && res.data.contacts) {
+          if (res.data && res.data.success && Array.isArray(res.data.contacts)) {
             contactList = res.data.contacts;
           }
         } catch (_) {}
 
-        if (contactList.length === 0) {
-          try {
-            const { data } = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-            contactList = data || [];
-          } catch (_) {}
-        }
-
         // Enrich contacts with conversation metadata (lastMessage, timestamps)
+        // Also include conversations with non-contact users if an active conversation exists
         try {
           const convRes = await apiClient.get(v1ConversationsRoute);
           if (convRes.data && convRes.data.success && convRes.data.conversations) {
             const convMap = new Map();
+            const existingContactIds = new Set(
+              contactList.map((c) => (c._id ? c._id.toString() : ""))
+            );
+
             for (const conv of convRes.data.conversations) {
               if (conv.otherParticipant && conv.otherParticipant._id) {
-                convMap.set(conv.otherParticipant._id.toString(), conv);
+                const otherId = conv.otherParticipant._id.toString();
+                convMap.set(otherId, conv);
+
+                // If user has an active conversation with messages with someone not yet in contactList, include them
+                if (!existingContactIds.has(otherId) && conv.lastMessage?.text) {
+                  contactList.push({
+                    ...conv.otherParticipant,
+                    conversationId: conv._id,
+                    lastMessage: conv.lastMessage,
+                    updatedAt: conv.updatedAt,
+                  });
+                  existingContactIds.add(otherId);
+                }
               }
             }
+
             contactList = contactList.map((c) => {
               const matchedConv = convMap.get(c._id ? c._id.toString() : "");
               if (matchedConv) {
