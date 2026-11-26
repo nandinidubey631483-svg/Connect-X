@@ -38,6 +38,14 @@ ConnectX is a production-grade, full-stack real-time communication platform buil
 - **Notification Engine (Phase 5 Module 9):**
   - Real-time Socket.IO notification delivery (`notification:new`, `notification:count`) respecting user preferences (`pushNotifications`, `soundEnabled`).
   - Deduplicated notification events with compound indexing and unread badge counters.
+- **Real-Time Voice & Video Calling (Phase 5 Module 11):**
+  - WebRTC peer-to-peer real-time audio and video communications.
+  - Socket.IO signaling gateway supporting call initiation, ringing, acceptance, rejection, cancellation, offer/answer SDP negotiation, ICE candidate exchange, and termination.
+  - Configurable STUN/TURN ICE server dispatch.
+  - Active voice calling screen with live duration timer, mute/unmute, and speaker toggles.
+  - Active video calling screen with full remote video, PiP local preview, and camera flip/toggle.
+  - 35s ringing timeout with automatic `MISSED_CALL` notifications.
+  - Filterable call history log (All, Missed, Voice, Video) with one-click callback.
 - **Studio Redesign UI (Phase 5 Module 10):**
   - Modern warm studio editorial palette (`#D9480F` Terracotta, `#F3EEE6` Linen Canvas, `#FFFDF9` Warm Cards).
   - Fully responsive grid layout with custom search, direct messaging lists, rich message bubbles, and notification dropdown.
