@@ -22,7 +22,7 @@ export default function Register() {
   const [step, setStep] = useState("form"); // 'form' | 'otp' | 'done'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState(null); // { checking: bool, available: bool, message: string }
 
   const toastOptions = {
@@ -107,9 +107,6 @@ export default function Register() {
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
-    if (isCaptchaVerified) {
-      setIsCaptchaVerified(false);
-    }
   };
 
   const handleValidation = () => {
@@ -148,6 +145,12 @@ export default function Register() {
       return false;
     } else if (!EMAIL_REGEX.test(email)) {
       toast.error("Please enter a valid email address.", toastOptions);
+      return false;
+    } else if (!isTestEnv && !termsAccepted) {
+      toast.error("Please agree to the Terms of Service and Privacy Policy.", toastOptions);
+      return false;
+    } else if (!isTestEnv && !isCaptchaVerified) {
+      toast.error("Please check the 'I’m not a robot' box to verify you are human.", toastOptions);
       return false;
     }
     return true;
@@ -410,28 +413,8 @@ export default function Register() {
 
                   <CaptchaShield
                     isVerified={isCaptchaVerified}
-                    onVerify={() => setIsCaptchaVerified(true)}
-                    disabled={
-                      isSubmitting ||
-                      !values.username.trim() ||
-                      !values.email.trim() ||
-                      !values.password ||
-                      !values.confirmPassword ||
-                      !termsAccepted
-                    }
-                    onDisabledClick={() => {
-                      if (!values.username.trim()) {
-                        toast.warn("Please enter a username first.", toastOptions);
-                      } else if (!values.email.trim()) {
-                        toast.warn("Please enter your email address first.", toastOptions);
-                      } else if (!values.password) {
-                        toast.warn("Please enter a password first.", toastOptions);
-                      } else if (!values.confirmPassword) {
-                        toast.warn("Please confirm your password first.", toastOptions);
-                      } else if (!termsAccepted) {
-                        toast.warn("Please agree to the Terms of Service first.", toastOptions);
-                      }
-                    }}
+                    onVerify={(token) => setIsCaptchaVerified(!!token)}
+                    disabled={isSubmitting}
                   />
 
                   <button
