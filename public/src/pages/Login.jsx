@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../hooks/useAuth";
 import CaptchaShield from "../components/auth/CaptchaShield";
+import AuthBackground from "../components/auth/AuthBackground";
 import LogoImg from "../assets/connectx-logo.png";
 
 export default function Login() {
@@ -61,6 +62,7 @@ export default function Login() {
   return (
     <>
       <div id="auth">
+        <AuthBackground />
         <div className="formside">
           <div className="form st">
             <div className="brand" style={{ marginBottom: "20px" }}>

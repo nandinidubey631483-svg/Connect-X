@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../hooks/useAuth";
 import CaptchaShield from "../components/auth/CaptchaShield";
 import OtpVerification from "../components/auth/OtpVerification";
+import AuthBackground from "../components/auth/AuthBackground";
 import apiClient from "../services/apiClient";
 import { v1AuthRoute } from "../services/apiRoutes";
 import LogoImg from "../assets/connectx-logo.png";
@@ -214,6 +215,7 @@ export default function Register() {
   return (
     <>
       <div id="auth">
+        <AuthBackground />
         <div className="formside">
           <div className="form st">
             <div className="brand" style={{ marginBottom: "20px" }}>

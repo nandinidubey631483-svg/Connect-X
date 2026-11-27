@@ -223,10 +223,15 @@ const Container = styled.div`
   justify-content: center;
   align-items: flex-start;
   height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   width: 100vw;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   background-color: var(--bg, #F3F1EC);
   background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
   background-size: 20px 20px;
