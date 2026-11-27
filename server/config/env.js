@@ -12,9 +12,11 @@ function validateEnv() {
   const port = process.env.PORT || 5000;
   const mongoUrl = process.env.MONGO_URL;
   const nodeEnv = process.env.NODE_ENV || "development";
-  const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim()) 
-    : ["http://localhost:3000"];
+  const rawOrigins = process.env.ALLOWED_ORIGINS || "http://localhost:3000";
+  const allowedOrigins = rawOrigins
+    .split(",")
+    .map((s) => s.trim().replace(/^["']|["']$/g, "").replace(/\/+$/, ""))
+    .filter(Boolean);
 
   if (!mongoUrl) {
     errors.push("MONGO_URL is required in environment variables.");

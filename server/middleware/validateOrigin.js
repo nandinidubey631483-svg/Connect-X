@@ -6,6 +6,7 @@
  */
 const config = require("../config/env");
 const AppError = require("../utils/appError");
+const { isOriginAllowed } = require("../utils/originMatcher");
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
@@ -52,12 +53,12 @@ function validateOrigin(req, res, next) {
     if (!clientOrigin) {
       return next(new AppError("Cross-Origin Protection: Missing or malformed origin header.", 403, "CORS_POLICY_VIOLATION"));
     }
-    if (!config.allowedOrigins.includes(clientOrigin)) {
+    if (!isOriginAllowed(clientOrigin)) {
       return next(new AppError("Cross-Origin Protection: Request origin not permitted.", 403, "CORS_POLICY_VIOLATION"));
     }
   } else {
     // Development mode: validate origin if present
-    if (clientOrigin && !config.allowedOrigins.includes(clientOrigin)) {
+    if (clientOrigin && !isOriginAllowed(clientOrigin)) {
       return next(new AppError("Cross-Origin Protection: Request origin not permitted.", 403, "CORS_POLICY_VIOLATION"));
     }
   }

@@ -31,8 +31,15 @@ if (config.trustProxy !== undefined) {
 
 // Security & Parsing Middleware
 const { cookieMiddleware } = require("./middleware/cookieConfig");
+const { isOriginAllowed } = require("./utils/originMatcher");
+
 app.use(cors({
-  origin: config.allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin || isOriginAllowed(origin)) {
+      return callback(null, origin || true);
+    }
+    return callback(new Error("CORS_POLICY_VIOLATION: Origin not permitted"));
+  },
   credentials: true,
   exposedHeaders: ["Content-Disposition"],
 }));

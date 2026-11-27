@@ -13,6 +13,7 @@
 const socketIo = require("socket.io");
 const config = require("../config/env");
 const { extractSafeOrigin } = require("../middleware/validateOrigin");
+const { isOriginAllowed } = require("../utils/originMatcher");
 const {
   socketAuthMiddleware,
   createSocketAuthMiddleware,
@@ -34,7 +35,12 @@ function initSocketGateway(server, options = {}) {
   const NotificationModel = options.notificationModel || Notification;
   const io = options.io || socketIo(server, {
     cors: {
-      origin: config.allowedOrigins,
+      origin: (origin, callback) => {
+        if (!origin || isOriginAllowed(origin)) {
+          return callback(null, origin || true);
+        }
+        return callback(new Error("CORS_POLICY_VIOLATION"), false);
+      },
       credentials: true,
     },
     allowRequest: (req, callback) => {
@@ -46,12 +52,12 @@ function initSocketGateway(server, options = {}) {
         if (!origin) {
           return callback("CORS_POLICY_VIOLATION: Missing or malformed origin header", false);
         }
-        if (!config.allowedOrigins.includes(origin)) {
+        if (!isOriginAllowed(origin)) {
           return callback("CORS_POLICY_VIOLATION: Origin not permitted", false);
         }
       } else {
         // Development mode: validate origin if present
-        if (origin && !config.allowedOrigins.includes(origin)) {
+        if (origin && !isOriginAllowed(origin)) {
           return callback("CORS_POLICY_VIOLATION: Origin not permitted", false);
         }
       }
