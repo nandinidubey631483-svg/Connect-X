@@ -35,24 +35,47 @@ function getTransporter() {
     return cachedTransporter;
   }
 
-  if (!config.smtp || !config.smtp.host) {
+  if (!config.smtp || (!config.smtp.host && !config.smtp.user?.includes("@gmail.com"))) {
     return null;
   }
 
-  cachedTransporter = nodemailer.createTransport({
-    host: config.smtp.host,
-    port: config.smtp.port,
-    secure: config.smtp.secure,
-    auth: (config.smtp.user && config.smtp.pass) ? {
-      user: config.smtp.user,
-      pass: config.smtp.pass,
-    } : undefined,
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    rateDelta: 1000,
-    rateLimit: 5,
-  });
+  const isGmail =
+    (config.smtp.host && config.smtp.host.includes("gmail")) ||
+    (config.smtp.user && config.smtp.user.includes("@gmail.com"));
+
+  const transportOptions = isGmail
+    ? {
+        service: "gmail",
+        auth: {
+          user: config.smtp.user,
+          pass: config.smtp.pass,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 10000,
+        socketTimeout: 20000,
+      }
+    : {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        secure: config.smtp.secure,
+        auth: (config.smtp.user && config.smtp.pass)
+          ? {
+              user: config.smtp.user,
+              pass: config.smtp.pass,
+            }
+          : undefined,
+        tls: {
+          rejectUnauthorized: false,
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 10000,
+        socketTimeout: 20000,
+      };
+
+  cachedTransporter = nodemailer.createTransport(transportOptions);
 
   return cachedTransporter;
 }

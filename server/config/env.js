@@ -75,13 +75,13 @@ function validateEnv() {
       credential: process.env.TURN_CREDENTIAL || null,
     },
     smtp: {
-      host: process.env.SMTP_HOST || null,
-      port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
-      secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
+      host: process.env.SMTP_HOST || (process.env.SMTP_USER?.includes("@gmail.com") ? "smtp.gmail.com" : null),
+      port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
+      secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465" || !process.env.SMTP_PORT,
       user: process.env.SMTP_USER ? process.env.SMTP_USER.trim() : null,
       pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, "") : null,
       from: process.env.EMAIL_FROM || (process.env.SMTP_USER ? `"ConnectX Security" <${process.env.SMTP_USER.trim()}>` : "ConnectX Security <no-reply@connectx.local>"),
-      isConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
+      isConfigured: Boolean((process.env.SMTP_HOST || process.env.SMTP_USER?.includes("@gmail.com")) && process.env.SMTP_USER && process.env.SMTP_PASS),
     },
   });
 }
