@@ -19,9 +19,12 @@ import {
 } from "./tokenManager";
 import { v1RefreshRoute, v1CsrfRoute } from "./apiRoutes";
 
-const baseURL =
-  process.env.REACT_APP_API_URL ||
-  (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
+const defaultApiHost =
+  typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000"
+    : (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
+
+const baseURL = process.env.REACT_APP_API_URL || defaultApiHost;
 
 const apiClient = axios.create({
   baseURL,
