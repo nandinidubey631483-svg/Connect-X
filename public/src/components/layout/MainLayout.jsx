@@ -130,11 +130,11 @@ export default function MainLayout({
         height: "100vh",
         width: "100vw",
         overflow: "hidden",
-        backgroundColor: "var(--bg-wallpaper, #E1EDE0)",
+        backgroundColor: "var(--bg-wallpaper, #ECE7DE)",
         backgroundImage: `url(${DoodleBg})`,
         backgroundRepeat: "repeat",
         backgroundSize: "380px 380px",
-        color: "var(--wallpaper-tint, #355639)",
+        color: "var(--wallpaper-tint, #D98B70)",
       }}
     >
       {/* DESKTOP FLOATING LEFT PANEL (Rail + Sidebar in Chat mode, or Rail in Page mode) */}
@@ -198,8 +198,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: activeRailTab === "chats" ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: activeRailTab === "chats" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "chats" ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: activeRailTab === "chats" ? "var(--acc, #D98B70)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -216,7 +216,7 @@ export default function MainLayout({
                     width: "4px",
                     height: "20px",
                     borderRadius: "0 4px 4px 0",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                   }}
                 />
               )}
@@ -235,8 +235,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: activeRailTab === "people" ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: activeRailTab === "people" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "people" ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: activeRailTab === "people" ? "var(--acc, #D98B70)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -253,7 +253,7 @@ export default function MainLayout({
                     width: "4px",
                     height: "20px",
                     borderRadius: "0 4px 4px 0",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                   }}
                 />
               )}
@@ -272,8 +272,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: activeRailTab === "calls" ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: activeRailTab === "calls" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "calls" ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: activeRailTab === "calls" ? "var(--acc, #D98B70)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -290,7 +290,7 @@ export default function MainLayout({
                     width: "4px",
                     height: "20px",
                     borderRadius: "0 4px 4px 0",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                   }}
                 />
               )}
@@ -309,8 +309,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: activeRailTab === "notifications" ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: activeRailTab === "notifications" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "notifications" ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: activeRailTab === "notifications" ? "var(--acc, #D98B70)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -325,7 +325,7 @@ export default function MainLayout({
                     position: "absolute",
                     top: "4px",
                     right: "4px",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                     color: "#fff",
                     fontSize: "10px",
                     fontWeight: "700",
@@ -340,11 +340,8 @@ export default function MainLayout({
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
-              {activeRailTab === "calls" && (
-            <CallsView onBack={() => handleTabChange("chats")} socket={socket} />
-          )}
 
-          {activeRailTab === "notifications" && (
+              {activeRailTab === "notifications" && (
                 <span
                   className="pip"
                   style={{
@@ -353,7 +350,7 @@ export default function MainLayout({
                     width: "4px",
                     height: "20px",
                     borderRadius: "0 4px 4px 0",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                   }}
                 />
               )}
@@ -372,8 +369,8 @@ export default function MainLayout({
                 borderRadius: "12px",
                 display: "grid",
                 placeItems: "center",
-                background: activeRailTab === "settings" ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: activeRailTab === "settings" ? "var(--acc, #4F46E5)" : "var(--mut, #6C6E78)",
+                background: activeRailTab === "settings" ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: activeRailTab === "settings" ? "var(--acc, #D98B70)" : "var(--mut, #6C6E78)",
                 position: "relative",
                 transition: "0.15s",
                 border: "none",
@@ -390,7 +387,7 @@ export default function MainLayout({
                     width: "4px",
                     height: "20px",
                     borderRadius: "0 4px 4px 0",
-                    background: "var(--acc, #4F46E5)",
+                    background: "var(--acc, #D98B70)",
                   }}
                 />
               )}
@@ -438,13 +435,13 @@ export default function MainLayout({
                   width: "40px",
                   height: "40px",
                   borderRadius: "14px",
-                  background: currentUser?.avatarImage ? "transparent" : "var(--acc, #4F46E5)",
+                  background: currentUser?.avatarImage ? "transparent" : "var(--acc, #D98B70)",
                   color: "#fff",
                   display: "grid",
                   placeItems: "center",
                   fontWeight: "600",
                   position: "relative",
-                  border: activeRailTab === "profile" ? "2px solid var(--acc, #4F46E5)" : "none",
+                  border: activeRailTab === "profile" ? "2px solid var(--acc, #D98B70)" : "none",
                   cursor: "pointer",
                   padding: 0,
                 }}

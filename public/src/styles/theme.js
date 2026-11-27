@@ -4,41 +4,41 @@
  */
 export const theme = {
   colors: {
-    // Primary Indigo & Accents
-    primary: "var(--acc, #4F46E5)",
-    primaryHover: "#4338CA",
-    primaryLight: "var(--acc2, #EEEDFD)",
-    primaryBg: "var(--acc2, #EEEDFD)",
-    primaryText: "var(--acc, #4F46E5)",
+    // Primary Terracotta & Accents
+    primary: "var(--acc, #D98B70)",
+    primaryHover: "#C4775D",
+    primaryLight: "var(--acc2, #FBF3EF)",
+    primaryBg: "var(--acc2, #FBF3EF)",
+    primaryText: "var(--acc, #D98B70)",
 
     // Background & Deep Surfaces
-    bgApp: "var(--bg, #F5F4F0)",
+    bgApp: "var(--bg, #F5F2ED)",
     bgSidebar: "var(--surf, #FFFFFF)",
     bgCard: "var(--surf, #FFFFFF)",
-    bgCardHover: "var(--s2, #FAF9F6)",
+    bgCardHover: "var(--s2, #FAF8F5)",
     bgInput: "var(--surf, #FFFFFF)",
     bgHeader: "var(--surf, #FFFFFF)",
-    bgMessageSent: "var(--me, #17181F)",
-    bgMessageReceived: "var(--s2, #FAF9F6)",
+    bgMessageSent: "var(--me, #D98B70)",
+    bgMessageReceived: "var(--s2, #FAF8F5)",
 
     // Borders & Dividers
-    border: "var(--line, #E7E5DF)",
-    borderLight: "var(--line, #E7E5DF)",
-    borderFocus: "var(--acc, #4F46E5)",
+    border: "var(--line, #E6E1D8)",
+    borderLight: "var(--line, #E6E1D8)",
+    borderFocus: "var(--acc, #D98B70)",
 
     // Typography
-    textPrimary: "var(--ink, #16171C)",
-    textSecondary: "var(--mut, #6C6E78)",
-    textMuted: "var(--mut, #6C6E78)",
+    textPrimary: "var(--ink, #252321)",
+    textSecondary: "var(--mut, #7A756F)",
+    textMuted: "var(--mut, #7A756F)",
 
     // Semantic Status Colors
-    online: "var(--ok, #15803D)",
+    online: "var(--ok, #2E7D32)",
     away: "#F59E0B",
-    offline: "var(--mut, #6C6E78)",
+    offline: "var(--mut, #7A756F)",
     danger: "var(--bad, #DC2626)",
     dangerHover: "#B91C1C",
-    success: "var(--ok, #15803D)",
-    signal: "var(--sig, #FF6A3D)",
+    success: "var(--ok, #2E7D32)",
+    signal: "var(--sig, #D98B70)",
   },
   typography: {
     fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
@@ -53,10 +53,10 @@ export const theme = {
     full: "9999px",
   },
   shadows: {
-    sm: "0 1px 2px rgba(20, 20, 30, 0.05)",
-    md: "0 8px 24px -12px rgba(20, 20, 30, 0.15)",
-    lg: "0 12px 28px -12px rgba(20, 20, 30, 0.25)",
-    glow: "0 0 16px rgba(79, 70, 229, 0.35)",
+    sm: "0 1px 2px rgba(37, 35, 33, 0.05)",
+    md: "0 8px 24px -12px rgba(37, 35, 33, 0.15)",
+    lg: "0 12px 28px -12px rgba(37, 35, 33, 0.25)",
+    glow: "0 0 16px rgba(217, 139, 112, 0.35)",
   },
   transitions: {
     default: "all 0.15s ease",

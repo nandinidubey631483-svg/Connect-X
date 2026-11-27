@@ -417,18 +417,18 @@ const CameraBadge = styled.button`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--acc, #6366F1);
+  background: var(--acc, #D98B70);
   color: white;
   border: 2px solid var(--surf, #FFFFFF);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 2px 6px rgba(217, 139, 112, 0.35);
   transition: all 0.15s ease-in-out;
 
   &:hover:not(:disabled) {
-    background: var(--acc2, #4F46E5);
+    background: var(--acc2, #D98B70);
     transform: scale(1.08);
   }
 
@@ -460,8 +460,8 @@ const ActionButton = styled.button`
 
   &:hover:not(:disabled) {
     background: var(--surf, #FFFFFF);
-    border-color: var(--acc, #6366F1);
-    color: var(--acc, #6366F1);
+    border-color: var(--acc, #D98B70);
+    color: var(--acc, #D98B70);
   }
 
   &:disabled {
@@ -530,8 +530,8 @@ const PresetCard = styled.button`
 
   &:hover:not(:disabled) {
     transform: scale(1.12);
-    border-color: var(--acc, #6366F1);
-    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+    border-color: var(--acc, #D98B70);
+    box-shadow: 0 4px 10px rgba(217, 139, 112, 0.25);
   }
 
   &:disabled {
@@ -562,9 +562,9 @@ const Input = styled.input`
   transition: border-color 0.15s ease;
 
   &:focus {
-    border-color: var(--acc, #6366F1);
+    border-color: var(--acc, #D98B70);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 2px rgba(217, 139, 112, 0.15);
   }
 `;
 
@@ -579,9 +579,9 @@ const TextArea = styled.textarea`
   transition: border-color 0.15s ease;
 
   &:focus {
-    border-color: var(--acc, #6366F1);
+    border-color: var(--acc, #D98B70);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 2px rgba(217, 139, 112, 0.15);
   }
 `;
 
@@ -615,7 +615,7 @@ const CancelButton = styled.button`
 `;
 
 const SaveButton = styled.button`
-  background: var(--acc, #6366F1);
+  background: var(--acc, #D98B70);
   color: white;
   border: none;
   padding: 0.55rem 1.3rem;
@@ -626,8 +626,8 @@ const SaveButton = styled.button`
   transition: all 0.15s ease-in-out;
 
   &:hover:not(:disabled) {
-    background: var(--acc2, #4F46E5);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    background: var(--acc2, #D98B70);
+    box-shadow: 0 2px 8px rgba(217, 139, 112, 0.35);
   }
 
   &:disabled {

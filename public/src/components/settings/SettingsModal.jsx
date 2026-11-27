@@ -377,12 +377,12 @@ const TabHeader = styled.div`
 const TabButton = styled.button`
   background: transparent;
   border: none;
-  color: ${(props) => (props.active ? "#4e0eff" : "#9a9a9a")};
+  color: ${(props) => (props.active ? "#D98B70" : "#9a9a9a")};
   font-weight: ${(props) => (props.active ? "600" : "500")};
   font-size: 0.9rem;
   padding: 0.5rem 0.8rem;
   cursor: pointer;
-  border-bottom: 2px solid ${(props) => (props.active ? "#4e0eff" : "transparent")};
+  border-bottom: 2px solid ${(props) => (props.active ? "#D98B70" : "transparent")};
   transition: all 0.2s ease-in-out;
 
   &:hover {
@@ -437,14 +437,14 @@ const SettingDesc = styled.span`
 
 const Select = styled.select`
   background-color: #131324;
-  border: 1px solid #4e0eff;
+  border: 1px solid #D98B70;
   border-radius: 0.4rem;
   color: white;
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
 
   &:focus {
-    border-color: #997af0;
+    border-color: #C4775D;
     outline: none;
   }
 `;
@@ -486,7 +486,7 @@ const ToggleSwitch = styled.label`
   }
 
   input:checked + .slider {
-    background-color: #4e0eff;
+    background-color: #D98B70;
   }
 
   input:checked + .slider:before {
@@ -543,7 +543,7 @@ const CancelButton = styled.button`
 `;
 
 const SaveButton = styled.button`
-  background-color: #4e0eff;
+  background-color: #D98B70;
   color: white;
   border: none;
   padding: 0.5rem 1.2rem;
@@ -553,7 +553,7 @@ const SaveButton = styled.button`
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background-color: #6930ff;
+    background-color: #C4775D;
   }
 
   &:disabled {

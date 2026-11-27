@@ -541,9 +541,9 @@ const BackButton = styled.button`
   transition: all 0.15s ease-in-out;
 
   &:hover {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: var(--acc, #4F46E5);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -591,14 +591,14 @@ const TabButton = styled.button`
   }
 
   &.active {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: rgba(79, 70, 229, 0.2);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
 const TabBadge = styled.span`
-  background: var(--acc, #4F46E5);
+  background: var(--acc, #D98B70);
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -658,9 +658,9 @@ const SearchInput = styled.input`
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 
   &:focus {
-    border-color: var(--acc, #4F46E5);
+    border-color: var(--acc, #D98B70);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+    box-shadow: 0 0 0 2px rgba(217, 139, 112, 0.25);
   }
 `;
 
@@ -676,7 +676,7 @@ const ClearButton = styled.button`
 `;
 
 const SearchSubmitBtn = styled.button`
-  background: var(--acc, #4F46E5);
+  background: var(--acc, #D98B70);
   color: white;
   border: none;
   padding: 0 1.4rem;
@@ -687,7 +687,7 @@ const SearchSubmitBtn = styled.button`
   transition: all 0.15s ease;
 
   &:hover:not(:disabled) {
-    background: #4338CA;
+    background: #C4775D;
   }
 `;
 
@@ -759,7 +759,7 @@ const ConnectButton = styled.button`
   gap: 0.4rem;
   padding: 0.55rem;
   border-radius: 10px;
-  background: var(--acc, #4F46E5);
+  background: var(--acc, #D98B70);
   color: white;
   border: none;
   font-size: 0.85rem;
@@ -767,7 +767,7 @@ const ConnectButton = styled.button`
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background: #4338CA;
+    background: #C4775D;
   }
 `;
 
@@ -800,15 +800,15 @@ const ConnectedButton = styled.button`
   gap: 0.4rem;
   padding: 0.55rem;
   border-radius: 10px;
-  background: var(--acc2, #EEEDFD);
-  color: var(--acc, #4F46E5);
+  background: var(--acc2, #FBF3EF);
+  color: var(--acc, #D98B70);
   border: 1px solid transparent;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
 
   &:hover {
-    background: #E0E0FC;
+    background: rgba(217, 139, 112, 0.15);
   }
 `;
 

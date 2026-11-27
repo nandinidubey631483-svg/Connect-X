@@ -79,7 +79,7 @@ export default function CallHistoryModal({ isOpen, onClose, socket }) {
       return <FiPhoneMissed size={16} color="var(--bad, #EF4444)" />;
     }
     if (c.direction === "OUTGOING") {
-      return <FiPhoneOutgoing size={16} color="var(--acc, #4F46E5)" />;
+      return <FiPhoneOutgoing size={16} color="var(--acc, #D98B70)" />;
     }
     return <FiPhoneIncoming size={16} color="#10B981" />;
   };
@@ -253,8 +253,8 @@ const TypeBadge = styled.span`
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  background: var(--acc2, #EEEDFD);
-  color: var(--acc, #4F46E5);
+  background: var(--acc2, #FBF3EF);
+  color: var(--acc, #D98B70);
 `;
 
 const ActionButtons = styled.div`
@@ -277,9 +277,9 @@ const ActionButton = styled.button`
   transition: all 0.15s ease;
 
   &:hover {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: var(--acc, #4F46E5);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 

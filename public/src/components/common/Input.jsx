@@ -60,7 +60,7 @@ const FieldWrapper = styled.div`
 
   &:focus-within {
     border-color: ${(props) => (props.hasError ? theme.colors.danger : theme.colors.borderFocus)};
-    box-shadow: 0 0 0 2px ${(props) => (props.hasError ? "rgba(239,68,68,0.2)" : "rgba(99,102,241,0.2)")};
+    box-shadow: 0 0 0 2px ${(props) => (props.hasError ? "rgba(239,68,68,0.2)" : "rgba(217, 139, 112,0.2)")};
   }
 `;
 

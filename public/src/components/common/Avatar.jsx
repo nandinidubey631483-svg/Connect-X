@@ -96,7 +96,7 @@ const AvatarFallback = styled.div`
   width: 100%;
   height: 100%;
   border-radius: ${(props) => (props.shape === "circle" ? "50%" : "14px")};
-  background: ${(props) => props.background || "linear-gradient(135deg, #4F46E5, #7C3AED)"};
+  background: ${(props) => props.background || "linear-gradient(135deg, #D98B70, #C4775D)"};
   color: #fff;
   display: flex;
   align-items: center;

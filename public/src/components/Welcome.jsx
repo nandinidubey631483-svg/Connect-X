@@ -49,11 +49,11 @@ const WallpaperContainer = styled.div`
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background-color: var(--bg-wallpaper, #E4ECE1);
+  background-color: var(--bg-wallpaper, #ECE7DE);
   background-image: url(${DoodleBg});
   background-repeat: repeat;
   background-size: 380px 380px;
-  color: var(--wallpaper-tint, #335436);
+  color: var(--wallpaper-tint, #D98B70);
   position: relative;
   overflow: hidden;
 `;
@@ -98,7 +98,7 @@ const LogoCircle = styled.div`
   border-radius: 24px;
   background: var(--surf, #FFFFFF);
   border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 24px rgba(217, 139, 112, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +122,7 @@ const BannerTitle = styled.h2`
   margin: 0;
 
   .accent {
-    color: var(--acc, #4F46E5);
+    color: var(--acc, #D98B70);
   }
 `;
 

@@ -70,7 +70,7 @@ export default function CallsView({ onBack, socket }) {
       return <FiPhoneMissed size={16} style={{ color: "var(--bad, #EF4444)" }} />;
     }
     if (call.direction === "OUTGOING") {
-      return <FiPhoneOutgoing size={16} style={{ color: "var(--acc, #4F46E5)" }} />;
+      return <FiPhoneOutgoing size={16} style={{ color: "var(--acc, #D98B70)" }} />;
     }
     return <FiPhoneIncoming size={16} style={{ color: "var(--ok, #10B981)" }} />;
   };
@@ -310,7 +310,7 @@ const TabButton = styled.button`
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
-  background: ${(props) => (props.active ? "var(--acc, #4F46E5)" : "var(--bg, #F3F4F6)")};
+  background: ${(props) => (props.active ? "var(--acc, #D98B70)" : "var(--bg, #F3F4F6)")};
   color: ${(props) => (props.active ? "#ffffff" : "var(--mut, #4B5563)")};
 
   &:hover {
@@ -425,9 +425,9 @@ const ActionButton = styled.button`
   transition: all 0.15s ease;
 
   &:hover {
-    background: var(--acc, #4f46e5);
+    background: var(--acc, #D98B70);
     color: #ffffff;
-    border-color: var(--acc, #4f46e5);
+    border-color: var(--acc, #D98B70);
     transform: scale(1.05);
   }
 `;

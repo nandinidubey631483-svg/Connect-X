@@ -153,7 +153,7 @@ export default function Chat({ initialTab }) {
           if (res.data && res.data.success && Array.isArray(res.data.contacts)) {
             contactList = res.data.contacts;
           }
-        } catch (_) {}
+        } catch (_) { }
 
         // Enrich contacts with conversation metadata (lastMessage, timestamps)
         // Also include conversations with non-contact users if an active conversation exists
@@ -196,7 +196,7 @@ export default function Chat({ initialTab }) {
               return c;
             });
           }
-        } catch (_) {}
+        } catch (_) { }
 
         setContacts(contactList);
       } else {
@@ -214,7 +214,7 @@ export default function Chat({ initialTab }) {
     if (chat && chat._id) {
       try {
         await apiClient.post(v1CreateConversationRoute, { participantId: chat._id });
-      } catch (_) {}
+      } catch (_) { }
     }
   };
 

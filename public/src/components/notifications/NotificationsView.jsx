@@ -392,9 +392,9 @@ const BackButton = styled.button`
   transition: all 0.15s ease-in-out;
 
   &:hover {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: var(--acc, #4F46E5);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -448,9 +448,9 @@ const FilterTab = styled.button`
   }
 
   &.active {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: rgba(79, 70, 229, 0.15);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: rgba(217, 139, 112, 0.15);
   }
 `;
 
@@ -464,12 +464,12 @@ const MarkAllBtn = styled.button`
   font-weight: 600;
   background: var(--s2, #FAF9F6);
   border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
-  color: var(--acc, #4F46E5);
+  color: var(--acc, #D98B70);
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover:not(:disabled) {
-    background: var(--acc2, #EEEDFD);
+    background: var(--acc2, #FBF3EF);
   }
 
   &:disabled {
@@ -566,7 +566,7 @@ const NotificationCard = styled.div`
 
   &.unread {
     background: #FAFAFE;
-    border-left: 4px solid var(--acc, #4F46E5);
+    border-left: 4px solid var(--acc, #D98B70);
 
     &::after {
       content: "";
@@ -576,7 +576,7 @@ const NotificationCard = styled.div`
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--acc, #4F46E5);
+      background: var(--acc, #D98B70);
     }
   }
 
@@ -599,8 +599,8 @@ const IconBadge = styled.div`
   flex-shrink: 0;
 
   &.msg {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
   }
   &.contact {
     background: rgba(16, 185, 129, 0.1);
@@ -666,8 +666,8 @@ const MarkReadMiniBtn = styled.button`
   transition: all 0.15s ease;
 
   &:hover {
-    color: var(--acc, #4F46E5);
-    border-color: var(--acc, #4F46E5);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -719,7 +719,7 @@ const EmptyIconBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--acc, #4F46E5);
+  color: var(--acc, #D98B70);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   margin-bottom: 0.5rem;
 `;

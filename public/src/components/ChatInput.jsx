@@ -100,8 +100,8 @@ export default function ChatInput({ handleSendMsg }) {
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
-            background: "var(--acc2, #EEEDFD)",
-            color: "var(--acc, #4F46E5)",
+            background: "var(--acc2, #FBF3EF)",
+            color: "var(--acc, #D98B70)",
             padding: "4px 12px",
             borderRadius: "99px",
             fontSize: "12px",
@@ -158,7 +158,7 @@ export default function ChatInput({ handleSendMsg }) {
           border: "1px solid var(--line)",
           borderRadius: "20px",
           padding: "7px 10px",
-          boxShadow: "0 10px 30px -14px rgba(79,70,229,.3)",
+          boxShadow: "0 10px 30px -14px rgba(217,139,112,.25)",
           transition: "0.2s",
         }}
       >
@@ -233,14 +233,14 @@ export default function ChatInput({ handleSendMsg }) {
             width: "36px",
             height: "36px",
             borderRadius: "14px",
-            background: msg.trim() || selectedFile ? "linear-gradient(135deg,#3B6FF0,#7C3AED)" : "var(--bg)",
+            background: msg.trim() || selectedFile ? "linear-gradient(135deg,#D98B70,#C4775D)" : "var(--bg)",
             color: "#fff",
             border: "none",
             cursor: msg.trim() || selectedFile ? "pointer" : "default",
             display: "grid",
             placeItems: "center",
             transition: "0.2s",
-            boxShadow: msg.trim() || selectedFile ? "0 6px 14px -6px rgba(91,75,232,.7)" : "none",
+            boxShadow: msg.trim() || selectedFile ? "0 6px 14px -6px rgba(217,139,112,.6)" : "none",
           }}
         >
           <FiSend size={15} style={{ marginLeft: "2px" }} />

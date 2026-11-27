@@ -26,9 +26,9 @@ import {
 } from "react-icons/fi";
 
 const pulse = keyframes`
-  0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5); }
-  70% { transform: scale(1.04); box-shadow: 0 0 0 20px rgba(79, 70, 229, 0); }
-  100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+  0% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(217, 139, 112, 0.5); }
+  70% { transform: scale(1.04); box-shadow: 0 0 0 20px rgba(217, 139, 112, 0); }
+  100% { transform: scale(0.98); box-shadow: 0 0 0 0 rgba(217, 139, 112, 0); }
 `;
 
 const ringPulse = keyframes`
@@ -409,8 +409,8 @@ const BadgePill = styled.div`
   gap: 6px;
   padding: 4px 12px;
   border-radius: 99px;
-  background: var(--acc2, #EEEDFD);
-  color: var(--acc, #4F46E5);
+  background: var(--acc2, #FBF3EF);
+  color: var(--acc, #D98B70);
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 20px;

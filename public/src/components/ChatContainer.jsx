@@ -260,7 +260,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
           className="receipt-status status-read rd"
           title="Read"
           data-testid="receipt-read"
-          style={{ color: "#8FF3FF", fontWeight: "600", fontSize: "12px", marginLeft: "4px" }}
+          style={{ color: "#FFE6DD", fontWeight: "600", fontSize: "12px", marginLeft: "4px" }}
         >
           ✓✓
         </span>
@@ -553,8 +553,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                 display: "grid",
                 placeItems: "center",
                 border: "1px solid var(--line)",
-                background: isDetailsOpen ? "var(--acc2, #EEEDFD)" : "transparent",
-                color: isDetailsOpen ? "var(--acc, #4F46E5)" : "var(--mut)",
+                background: isDetailsOpen ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: isDetailsOpen ? "var(--acc, #D98B70)" : "var(--mut)",
               }}
             >
               <FiSidebar size={16} />
@@ -596,9 +596,9 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                   lineHeight: "1.45",
                   boxShadow: "0 1px 2px rgba(20, 20, 40, 0.05)",
                   background: isMe
-                    ? "linear-gradient(135deg, #3B6FF0 0%, #5B4BE8 55%, #7C3AED 100%)"
+                    ? "linear-gradient(135deg, #D98B70 0%, #C4775D 100%)"
                     : "var(--surf, #FFFFFF)",
-                  color: isMe ? "#FFFFFF" : "var(--ink, #16171C)",
+                  color: isMe ? "#FFFFFF" : "var(--ink, #252321)",
                   border: isMe ? "none" : "1px solid var(--line)",
                 }}
               >
@@ -853,8 +853,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                     fontWeight: "600",
                     padding: "2px 8px",
                     borderRadius: "99px",
-                    background: "var(--acc2, #EEEDFD)",
-                    color: "var(--acc, #4F46E5)",
+                    background: "var(--acc2, #FBF3EF)",
+                    color: "var(--acc, #D98B70)",
                   }}
                 >
                   {sharedMedia.length}
@@ -948,8 +948,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                     fontWeight: "600",
                     padding: "2px 8px",
                     borderRadius: "99px",
-                    background: "var(--acc2, #EEEDFD)",
-                    color: "var(--acc, #4F46E5)",
+                    background: "var(--acc2, #FBF3EF)",
+                    color: "var(--acc, #D98B70)",
                   }}
                 >
                   {sharedFiles.length}
@@ -994,10 +994,10 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                           width: "30px",
                           height: "30px",
                           borderRadius: "8px",
-                          background: "var(--acc2, #EEEDFD)",
+                          background: "var(--acc2, #FBF3EF)",
                           display: "grid",
                           placeItems: "center",
-                          color: "var(--acc, #4F46E5)",
+                          color: "var(--acc, #D98B70)",
                           flexShrink: 0,
                         }}
                       >
@@ -1082,7 +1082,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                     width: "38px",
                     height: "22px",
                     borderRadius: "99px",
-                    background: isMuted ? "var(--acc, #4F46E5)" : "var(--line)",
+                    background: isMuted ? "var(--acc, #D98B70)" : "var(--line)",
                     position: "relative",
                     transition: "0.2s",
                     cursor: "pointer",
@@ -1143,9 +1143,9 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
 }
 
 const Container = styled.div`
-  background-color: var(--bg-wallpaper, #E4ECE1);
+  background-color: var(--bg-wallpaper, #ECE7DE);
   background-image: url(${DoodleBg});
   background-repeat: repeat;
   background-size: 380px 380px;
-  color: var(--wallpaper-tint, #335436);
+  color: var(--wallpaper-tint, #D98B70);
 `;

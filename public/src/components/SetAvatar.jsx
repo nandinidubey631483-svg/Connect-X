@@ -122,8 +122,8 @@ export default function SetAvatar() {
               <BrandLogo viewBox="0 0 40 40">
                 <defs>
                   <linearGradient id="logo-g" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#4F46E5" />
-                    <stop offset="100%" stopColor="#7C3AED" />
+                    <stop offset="0%" stopColor="#D98B70" />
+                    <stop offset="100%" stopColor="#C4775D" />
                   </linearGradient>
                 </defs>
                 <circle cx="20" cy="20" r="18" fill="url(#logo-g)" />
@@ -298,14 +298,14 @@ const UploadCard = styled.div`
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    border-color: var(--acc, #6366F1);
+    border-color: var(--acc, #D98B70);
     background: #F8FAFC;
   }
 
   &.selected {
-    border-color: var(--acc, #6366F1);
+    border-color: var(--acc, #D98B70);
     border-style: solid;
-    background: rgba(99, 102, 241, 0.04);
+    background: rgba(217, 139, 112, 0.04);
   }
 `;
 
@@ -318,7 +318,7 @@ const UploadPlaceholder = styled.div`
 const UploadIcon = styled.svg`
   width: 24px;
   height: 24px;
-  color: var(--acc, #6366F1);
+  color: var(--acc, #D98B70);
   flex-shrink: 0;
 `;
 
@@ -353,7 +353,7 @@ const CustomPreviewContainer = styled.div`
 `;
 
 const SelectedCheckmark = styled.span`
-  background: var(--acc, #6366F1);
+  background: var(--acc, #D98B70);
   color: white;
   padding: 0.25rem 0.65rem;
   border-radius: 20px;
@@ -417,9 +417,9 @@ const AvatarItem = styled.div`
   }
 
   &.selected {
-    border-color: var(--acc, #6366F1);
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
-    background: rgba(99, 102, 241, 0.06);
+    border-color: var(--acc, #D98B70);
+    box-shadow: 0 4px 14px rgba(217, 139, 112, 0.35);
+    background: var(--acc2, #FBF3EF);
 
     img {
       transform: scale(1.04);
@@ -434,7 +434,7 @@ const CheckBadge = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--acc, #6366F1);
+  background: var(--acc, #D98B70);
   color: white;
   display: flex;
   align-items: center;
@@ -453,7 +453,7 @@ const ButtonGroup = styled.div`
 `;
 
 const SubmitButton = styled.button`
-  background: var(--acc, #6366F1);
+  background: var(--acc, #D98B70);
   color: white;
   padding: 0.85rem 1.5rem;
   border: none;
@@ -463,10 +463,10 @@ const SubmitButton = styled.button`
   font-size: 0.95rem;
   width: 100%;
   transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.28);
+  box-shadow: 0 4px 12px rgba(217, 139, 112, 0.35);
 
   &:hover:not(:disabled) {
-    background: var(--acc2, #4F46E5);
+    background: #C4775D;
     transform: translateY(-1px);
   }
 

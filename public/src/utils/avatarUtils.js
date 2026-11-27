@@ -7,16 +7,16 @@
  * 3. Curated modern designer vector avatars (clean, professional, modern SaaS aesthetic)
  */
 
-// 8 Distinct, modern gradient pairs
+// 8 Distinct, modern warm palette gradient pairs
 export const AVATAR_GRADIENTS = [
-  { from: "#4F46E5", to: "#7C3AED", name: "indigo-violet" },
-  { from: "#059669", to: "#10B981", name: "emerald" },
-  { from: "#2563EB", to: "#06B6D4", name: "royal-cyan" },
-  { from: "#E11D48", to: "#FB7185", name: "rose" },
+  { from: "#D98B70", to: "#C4775D", name: "terracotta" },
+  { from: "#252321", to: "#3D3835", name: "charcoal" },
+  { from: "#C2704E", to: "#D98B70", name: "warm-clay" },
+  { from: "#A85D44", to: "#D98B70", name: "rust" },
   { from: "#D97706", to: "#F59E0B", name: "amber" },
-  { from: "#9333EA", to: "#C084FC", name: "purple" },
-  { from: "#0891B2", to: "#3B82F6", name: "ocean" },
-  { from: "#EA580C", to: "#F97316", name: "orange" },
+  { from: "#4A4540", to: "#252321", name: "slate-charcoal" },
+  { from: "#524A42", to: "#7A7067", name: "warm-stone" },
+  { from: "#C05621", to: "#DD6B20", name: "copper" },
 ];
 
 /**
@@ -116,8 +116,8 @@ export const MODERN_AVATARS = [
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
         <defs>
           <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#4F46E5"/>
-            <stop offset="100%" stop-color="#7C3AED"/>
+            <stop offset="0%" stop-color="#D98B70"/>
+            <stop offset="100%" stop-color="#C4775D"/>
           </linearGradient>
           <linearGradient id="skin1" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#FFDFBA"/>
@@ -144,9 +144,9 @@ export const MODERN_AVATARS = [
         <!-- Smile -->
         <path d="M57 65 Q64 71 71 65" stroke="#9A3412" stroke-width="2.4" stroke-linecap="round" fill="none"/>
         <!-- Sleek Wire Glasses -->
-        <rect x="46" y="48" width="15" height="12" rx="4" fill="none" stroke="#6366F1" stroke-width="2"/>
-        <rect x="67" y="48" width="15" height="12" rx="4" fill="none" stroke="#6366F1" stroke-width="2"/>
-        <line x1="61" y1="53" x2="67" y2="53" stroke="#6366F1" stroke-width="2"/>
+        <rect x="46" y="48" width="15" height="12" rx="4" fill="none" stroke="#D98B70" stroke-width="2"/>
+        <rect x="67" y="48" width="15" height="12" rx="4" fill="none" stroke="#D98B70" stroke-width="2"/>
+        <line x1="61" y1="53" x2="67" y2="53" stroke="#D98B70" stroke-width="2"/>
       </svg>
     `),
   },
@@ -274,8 +274,8 @@ export const MODERN_AVATARS = [
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
         <defs>
           <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#7C3AED"/>
-            <stop offset="100%" stop-color="#C084FC"/>
+            <stop offset="0%" stop-color="#C4775D"/>
+            <stop offset="100%" stop-color="#D98B70"/>
           </linearGradient>
         </defs>
         <rect width="128" height="128" rx="36" fill="url(#bg5)"/>

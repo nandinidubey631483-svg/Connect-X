@@ -185,7 +185,7 @@ export function calculatePasswordStrength(password) {
     0: { label: "Too weak", color: "#EF4444" },
     1: { label: "Weak", color: "#EF4444" },
     2: { label: "Fair", color: "#F59E0B" },
-    3: { label: "Good", color: "#3B82F6" },
+    3: { label: "Good", color: "#D98B70" },
     4: { label: "Strong", color: "#10B981" },
   };
 

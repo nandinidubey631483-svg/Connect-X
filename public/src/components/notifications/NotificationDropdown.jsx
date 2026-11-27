@@ -343,7 +343,7 @@ const NotificationItem = styled.div`
   justify-content: space-between;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid ${theme.colors.border};
-  background-color: ${(props) => (props.isRead ? "transparent" : "rgba(99, 102, 241, 0.1)")};
+  background-color: ${(props) => (props.isRead ? "transparent" : "rgba(217, 139, 112, 0.1)")};
   cursor: pointer;
   transition: ${theme.transitions.default};
 

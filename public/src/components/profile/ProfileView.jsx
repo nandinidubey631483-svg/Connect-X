@@ -415,9 +415,9 @@ const BackButton = styled.button`
   transition: all 0.15s ease-in-out;
 
   &:hover {
-    background: var(--acc2, #EEEDFD);
-    color: var(--acc, #4F46E5);
-    border-color: var(--acc, #4F46E5);
+    background: var(--acc2, #FBF3EF);
+    color: var(--acc, #D98B70);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -522,19 +522,19 @@ const CameraBadge = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--acc, #4F46E5);
+  background: var(--acc, #D98B70);
   color: white;
   border: 3px solid var(--surf, #FFFFFF);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 3px 8px rgba(217, 139, 112, 0.35);
   transition: all 0.15s ease-in-out;
 
   &:hover:not(:disabled) {
     transform: scale(1.08);
-    background: #4338CA;
+    background: #C4775D;
   }
 `;
 
@@ -551,8 +551,8 @@ const UploadButton = styled.button`
   justify-content: center;
   gap: 0.4rem;
   padding: 0.55rem 0.8rem;
-  background: var(--acc2, #EEEDFD);
-  color: var(--acc, #4F46E5);
+  background: var(--acc2, #FBF3EF);
+  color: var(--acc, #D98B70);
   border: 1px solid transparent;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -581,7 +581,7 @@ const PresetToggleButton = styled.button`
 
   &:hover {
     background: var(--surf, #FFFFFF);
-    border-color: var(--acc, #4F46E5);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -628,7 +628,7 @@ const PresetOption = styled.button`
 
   &:hover:not(:disabled) {
     transform: scale(1.08);
-    border-color: var(--acc, #4F46E5);
+    border-color: var(--acc, #D98B70);
   }
 `;
 
@@ -720,10 +720,10 @@ const Input = styled.input`
   transition: border-color 0.15s ease;
 
   &:focus {
-    border-color: var(--acc, #4F46E5);
+    border-color: var(--acc, #D98B70);
     outline: none;
     background: var(--surf, #FFFFFF);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+    box-shadow: 0 0 0 2px rgba(217, 139, 112, 0.12);
   }
 `;
 
@@ -738,10 +738,10 @@ const TextArea = styled.textarea`
   transition: border-color 0.15s ease;
 
   &:focus {
-    border-color: var(--acc, #4F46E5);
+    border-color: var(--acc, #D98B70);
     outline: none;
     background: var(--surf, #FFFFFF);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+    box-shadow: 0 0 0 2px rgba(217, 139, 112, 0.12);
   }
 `;
 
@@ -774,7 +774,7 @@ const SaveButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--acc, #4F46E5);
+  background: var(--acc, #D98B70);
   color: white;
   border: none;
   padding: 0.65rem 1.6rem;
@@ -782,11 +782,11 @@ const SaveButton = styled.button`
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 2px 8px rgba(217, 139, 112, 0.3);
   transition: all 0.15s ease-in-out;
 
   &:hover:not(:disabled) {
-    background: #4338CA;
+    background: #C4775D;
     transform: translateY(-1px);
   }
 
