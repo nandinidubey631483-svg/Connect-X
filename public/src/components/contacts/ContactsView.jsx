@@ -285,7 +285,10 @@ export default function ContactsView({
               ) : (
                 <UsersGrid>
                   {users.map((u) => {
-                    const isActionLoading = actionLoadingId === u._id || actionLoadingId === u.requestId;
+                    const isActionLoading =
+                      Boolean(actionLoadingId) &&
+                      (actionLoadingId === u._id ||
+                        (Boolean(u.requestId) && actionLoadingId === u.requestId));
                     return (
                       <UserCard key={u._id}>
                         <Avatar
@@ -317,8 +320,9 @@ export default function ContactsView({
                               type="button"
                               disabled={isActionLoading}
                               onClick={() => handleCancelRequest(u.requestId, u._id)}
+                              title="Withdraw contact request"
                             >
-                              <FiClock size={14} /> Pending (Cancel)
+                              <FiClock size={14} /> {isActionLoading ? "Withdrawing..." : "Withdraw"}
                             </PendingButton>
                           ) : u.relationship === "PENDING_RECEIVED" ? (
                             <AcceptButton
@@ -441,8 +445,9 @@ export default function ContactsView({
                             <CancelMiniBtn
                               disabled={isActing}
                               onClick={() => handleCancelRequest(r._id, recipient._id)}
+                              title="Withdraw sent invitation"
                             >
-                              Cancel Request
+                              {isActing ? "Withdrawing..." : "Withdraw"}
                             </CancelMiniBtn>
                           </ReqActions>
                         </RequestCard>

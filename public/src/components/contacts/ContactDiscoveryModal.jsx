@@ -247,11 +247,11 @@ export default function ContactDiscoveryModal({ isOpen, onClose, onContactsUpdat
                         size="sm"
                         variant="primary"
                         onClick={() => handleSendRequest(u._id)}
-                        disabled={actionLoadingId === u._id}
+                        disabled={Boolean(actionLoadingId) && actionLoadingId === u._id}
                         data-testid={`btn-add-${u.username}`}
                       >
                         <BiUserPlus style={{ marginRight: "0.25rem" }} />
-                        Add
+                        {Boolean(actionLoadingId) && actionLoadingId === u._id ? "Connecting..." : "Add"}
                       </Button>
                     )}
 
@@ -260,11 +260,11 @@ export default function ContactDiscoveryModal({ isOpen, onClose, onContactsUpdat
                         size="sm"
                         variant="secondary"
                         onClick={() => handleCancelRequest(u.requestId, u._id)}
-                        disabled={actionLoadingId === u.requestId}
+                        disabled={Boolean(actionLoadingId) && Boolean(u.requestId) && actionLoadingId === u.requestId}
                         data-testid={`btn-cancel-${u.username}`}
                       >
                         <BiTime style={{ marginRight: "0.25rem" }} />
-                        Pending
+                        {Boolean(actionLoadingId) && Boolean(u.requestId) && actionLoadingId === u.requestId ? "Withdrawing..." : "Withdraw"}
                       </Button>
                     )}
 
@@ -409,7 +409,7 @@ export default function ContactDiscoveryModal({ isOpen, onClose, onContactsUpdat
                       size="sm"
                       variant="secondary"
                       onClick={() => handleCancelRequest(reqItem._id, targetUser._id)}
-                      disabled={actionLoadingId === reqItem._id}
+                      disabled={Boolean(actionLoadingId) && actionLoadingId === reqItem._id}
                     >
                       Cancel
                     </Button>
