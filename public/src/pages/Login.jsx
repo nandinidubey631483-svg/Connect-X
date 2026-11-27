@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../hooks/useAuth";
-import AuthHero from "../components/auth/AuthHero";
 import CaptchaShield from "../components/auth/CaptchaShield";
 import LogoImg from "../assets/connectx-logo.png";
 
@@ -62,8 +61,6 @@ export default function Login() {
   return (
     <>
       <div id="auth">
-        <AuthHero />
-
         <div className="formside">
           <div className="form st">
             <div className="brand" style={{ marginBottom: "20px" }}>
