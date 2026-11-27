@@ -22,7 +22,7 @@ import { v1RefreshRoute, v1CsrfRoute } from "./apiRoutes";
 const defaultApiHost =
   typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
     ? "http://localhost:5000"
-    : (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
+    : (process.env.REACT_APP_API_URL || "https://connect-x-1div.onrender.com");
 
 const baseURL = process.env.REACT_APP_API_URL || defaultApiHost;
 

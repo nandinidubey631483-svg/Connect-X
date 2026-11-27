@@ -5,7 +5,7 @@
 const defaultApiHost =
   typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
     ? "http://localhost:5000"
-    : (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
+    : (process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_URL || "https://connect-x-1div.onrender.com");
 
 export const host =
   process.env.REACT_APP_SOCKET_URL ||
