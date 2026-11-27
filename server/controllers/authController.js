@@ -36,6 +36,11 @@ const {
   CSRF_TOKEN_COOKIE,
   getCookieOptions,
 } = require("../middleware/cookieConfig");
+const {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+} = require("../utils/validators");
 const AppError = require("../utils/appError");
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -56,11 +61,29 @@ async function register(req, res, next) {
       return next(new AppError("Password must be at least 8 characters long.", 400, "VALIDATION_ERROR"));
     }
 
+    const usernameVal = validateUsername(username);
+    if (!usernameVal.isValid) {
+      return next(new AppError(usernameVal.error, 400, "VALIDATION_ERROR"));
+    }
+
+    const emailVal = validateEmail(email);
+    if (!emailVal.isValid) {
+      return next(new AppError(emailVal.error, 400, "VALIDATION_ERROR"));
+    }
+
+    const passwordVal = validatePassword(password);
+    if (!passwordVal.isValid) {
+      return next(new AppError(passwordVal.error, 400, "VALIDATION_ERROR"));
+    }
+
+    const cleanUsername = usernameVal.sanitized;
+    const cleanEmail = emailVal.sanitized;
+
     // Verify OTP token if provided
     let verifiedOtpDoc = null;
     if (otpVerificationToken) {
       verifiedOtpDoc = await Otp.findOne({
-        email: email.toLowerCase().trim(),
+        email: cleanEmail,
         verificationToken: otpVerificationToken,
         consumed: true,
       });
@@ -70,21 +93,24 @@ async function register(req, res, next) {
       }
     }
 
-    // Check existing username or email
+    // Check existing username or email (case-insensitive regex for email)
     const existingUser = await User.findOne({
-      $or: [{ username }, { email }],
+      $or: [
+        { username: cleanUsername },
+        { email: cleanEmail },
+      ],
     });
 
     if (existingUser) {
-      const field = existingUser.username === username ? "Username" : "Email";
+      const field = existingUser.username.toLowerCase() === cleanUsername.toLowerCase() ? "Username" : "Email";
       return next(new AppError(`${field} already in use.`, 409, "USER_ALREADY_EXISTS"));
     }
 
     // Hash password with salt rounds 12
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     const user = await User.create({
-      username,
-      email,
+      username: cleanUsername,
+      email: cleanEmail,
       password: hashedPassword,
     });
 
@@ -144,10 +170,15 @@ async function register(req, res, next) {
 async function login(req, res, next) {
   try {
     const { username, email, password } = req.body || {};
-    const identifier = username || email;
+    const rawIdentifier = username || email;
+    const identifier = typeof rawIdentifier === "string" ? rawIdentifier.trim() : "";
 
     if (!identifier || !password) {
       return next(new AppError("Username/email and password are required.", 400, "VALIDATION_ERROR"));
+    }
+
+    if (typeof password !== "string" || password.length > 128) {
+      return next(new AppError("Incorrect username or password.", 401, "INVALID_CREDENTIALS"));
     }
 
     // Select password explicitly (select: false)

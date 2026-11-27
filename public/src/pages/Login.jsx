@@ -45,7 +45,7 @@ export default function Login() {
     setIsSubmitting(true);
     try {
       const { username, password } = values;
-      await login(username, password);
+      await login(username.trim(), password);
       navigate("/");
     } catch (err) {
       const errorMessage =

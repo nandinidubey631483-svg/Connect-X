@@ -25,35 +25,47 @@ export default function AuthHero() {
     let width = 0;
     let height = 0;
 
-    // Ambient floating glow orbs
-    const orbs = [
-      { x: 0.25, y: 0.22, r: 260, rBase: 260, color: "rgba(79, 70, 229, ", maxAlpha: 0.35, speedX: 0.0007, speedY: 0.0009, phase: 0 },
-      { x: 0.78, y: 0.32, r: 280, rBase: 280, color: "rgba(124, 58, 237, ", maxAlpha: 0.28, speedX: -0.0008, speedY: 0.0006, phase: 2.1 },
-      { x: 0.35, y: 0.72, r: 310, rBase: 310, color: "rgba(255, 106, 61, ", maxAlpha: 0.18, speedX: 0.0006, speedY: -0.0007, phase: 4.3 },
-      { x: 0.82, y: 0.78, r: 240, rBase: 240, color: "rgba(6, 182, 212, ", maxAlpha: 0.22, speedX: -0.0005, speedY: -0.0008, phase: 1.5 },
+    // Organic warm ambient glows (Charcoal #252321 backdrop + Terracotta #D98B70 & Warm Ivory #F5F2ED warmth)
+    // Completely devoid of blue/purple gradients, stars, or floating particles.
+    const warmGlows = [
+      {
+        x: 0.32,
+        y: 0.28,
+        rBase: 340,
+        color: "rgba(217, 139, 112, ", // Terracotta
+        maxAlpha: 0.14,
+        speedX: 0.0004,
+        speedY: 0.0006,
+        phase: 0.2,
+      },
+      {
+        x: 0.75,
+        y: 0.72,
+        rBase: 380,
+        color: "rgba(217, 139, 112, ", // Terracotta
+        maxAlpha: 0.11,
+        speedX: -0.0005,
+        speedY: -0.0004,
+        phase: 2.8,
+      },
+      {
+        x: 0.55,
+        y: 0.48,
+        rBase: 290,
+        color: "rgba(245, 242, 237, ", // Warm Ivory ambient core
+        maxAlpha: 0.04,
+        speedX: 0.0003,
+        speedY: -0.0005,
+        phase: 1.4,
+      },
     ];
 
-    // Subtle ambient starlight dust (clean floating particles, no spiderweb lines!)
-    let stars = [];
-
     const fit = () => {
-      width = parent.clientWidth || 400;
-      height = parent.clientHeight || 600;
+      width = parent.clientWidth || 440;
+      height = parent.clientHeight || 700;
       canvas.width = width * dp;
       canvas.height = height * dp;
       if (ctx.setTransform) ctx.setTransform(dp, 0, 0, dp, 0, 0);
-
-      const count = Math.min(36, Math.max(16, Math.round((width * height) / 18000)));
-      stars = Array.from({ length: count }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        r: Math.random() * 1.4 + 0.6,
-        alpha: Math.random() * 0.4 + 0.15,
-        baseAlpha: Math.random() * 0.4 + 0.15,
-        speed: Math.random() * 0.002 + 0.001,
-        phase: Math.random() * Math.PI * 2,
-        vy: -(Math.random() * 0.18 + 0.05),
-      }));
     };
 
     if (typeof ResizeObserver !== "undefined") {
@@ -62,8 +74,8 @@ export default function AuthHero() {
     }
     fit();
 
-    let targetMouse = { x: width * 0.5, y: height * 0.4 };
-    let currentMouse = { x: width * 0.5, y: height * 0.4 };
+    let targetMouse = { x: width * 0.5, y: height * 0.45 };
+    let currentMouse = { x: width * 0.5, y: height * 0.45 };
 
     const handleMouseMove = (e) => {
       const rect = parent.getBoundingClientRect();
@@ -73,7 +85,7 @@ export default function AuthHero() {
 
     const handleMouseLeave = () => {
       targetMouse.x = width * 0.5;
-      targetMouse.y = height * 0.4;
+      targetMouse.y = height * 0.45;
     };
 
     parent.addEventListener("mousemove", handleMouseMove);
@@ -85,52 +97,33 @@ export default function AuthHero() {
       const t = (now - startTime) * 0.001;
       ctx.clearRect(0, 0, width, height);
 
-      // Smooth mouse easing
-      currentMouse.x += (targetMouse.x - currentMouse.x) * 0.03;
-      currentMouse.y += (targetMouse.y - currentMouse.y) * 0.03;
+      // Smooth mouse easing for quiet, luxurious parallax
+      currentMouse.x += (targetMouse.x - currentMouse.x) * 0.02;
+      currentMouse.y += (targetMouse.y - currentMouse.y) * 0.02;
 
-      // 1. Draw glowing ambient aurora orbs
-      for (const orb of orbs) {
-        // Organic sinusoidal floating drift
-        const driftX = Math.sin(t * 0.6 + orb.phase) * (width * 0.08);
-        const driftY = Math.cos(t * 0.5 + orb.phase) * (height * 0.08);
-        
-        // Gentle lean toward mouse
-        const mouseLeanX = (currentMouse.x - width * 0.5) * 0.06;
-        const mouseLeanY = (currentMouse.y - height * 0.5) * 0.06;
+      // Render warm ambient terracotta & ivory glows
+      for (const glow of warmGlows) {
+        const driftX = Math.sin(t * 0.45 + glow.phase) * (width * 0.06);
+        const driftY = Math.cos(t * 0.4 + glow.phase) * (height * 0.06);
 
-        const cx = orb.x * width + driftX + mouseLeanX;
-        const cy = orb.y * height + driftY + mouseLeanY;
-        const r = orb.rBase * (width / 500);
+        const mouseLeanX = (currentMouse.x - width * 0.5) * 0.04;
+        const mouseLeanY = (currentMouse.y - height * 0.5) * 0.04;
+
+        const cx = glow.x * width + driftX + mouseLeanX;
+        const cy = glow.y * height + driftY + mouseLeanY;
+        const r = glow.rBase * (width / 500);
 
         try {
           const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-          grad.addColorStop(0, `${orb.color}${orb.maxAlpha})`);
-          grad.addColorStop(0.5, `${orb.color}${orb.maxAlpha * 0.35})`);
-          grad.addColorStop(1, `${orb.color}0)`);
+          grad.addColorStop(0, `${glow.color}${glow.maxAlpha})`);
+          grad.addColorStop(0.55, `${glow.color}${glow.maxAlpha * 0.35})`);
+          grad.addColorStop(1, `${glow.color}0)`);
 
           ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.arc(cx, cy, r, 0, Math.PI * 2);
           ctx.fill();
         } catch (_) {}
-      }
-
-      // 2. Draw soft ambient starlight dust particles
-      for (const star of stars) {
-        star.y += star.vy;
-        if (star.y < 0) {
-          star.y = height;
-          star.x = Math.random() * width;
-        }
-
-        const pulse = Math.sin(t * 2 + star.phase);
-        const a = Math.max(0.08, star.baseAlpha + pulse * 0.15);
-
-        ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       animId = requestAnimationFrame(loop);
@@ -147,106 +140,155 @@ export default function AuthHero() {
   }, []);
 
   return (
-    <div className="hero">
-      {/* Ambient background canvas */}
-      <canvas ref={canvasRef} className="net" />
+    <div className="hero" role="region" aria-label="Brand Overview">
+      {/* Subtle organic warm terracotta ambient canvas */}
+      <canvas ref={canvasRef} className="net" aria-hidden="true" />
 
       {/* Brand Header */}
       <div className="brand">
-        <img src={LogoImg} alt="ConnectX" className="lg2" style={{ height: "36px", width: "auto" }} />
+        <img
+          src={LogoImg}
+          alt="ConnectX"
+          className="lg2"
+          style={{ height: "34px", width: "auto" }}
+        />
         <span className="wm" style={{ fontSize: "22px", fontWeight: "700", letterSpacing: "-0.03em" }}>
           Connect<i>X</i>
         </span>
-      </div>
-
-      {/* Hero Headline & Social Proof */}
-      <div>
-        <h1 className="serif">
-          The messenger for teams that <em>move fast.</em>
-        </h1>
-        <p>High-signal chats, verified devices, media sharing, and real-time receipts. Clean by design.</p>
-        <div className="pres">
-          <span className="live"></span>
-          <span><b>1,248</b> people online now</span>
+        <div className="hero-tag">
+          <span className="hero-tag-dot"></span>
+          <span>Private Studio</span>
         </div>
       </div>
 
-      {/* Modern Upright Glassmorphic Showcase Card */}
-      <div className="stage">
-        {/* Header */}
-        <div className="sh">
-          <div className="av">
-            <span>AM</span>
+      {/* Hero Headline & Editorial Subtitle */}
+      <div className="hero-lead">
+        <h1 className="serif">
+          Crafted for clarity. <em>Designed for depth.</em>
+        </h1>
+        <p>
+          A quiet, intentional environment for high-signal communication. Encrypted, instant,
+          and stripped of distraction.
+        </p>
+      </div>
+
+      {/* Architectural Studio Slate */}
+      <div className="slate">
+        {/* Slate Header */}
+        <div className="slate-header">
+          <div className="slate-av">
+            <span>CX</span>
           </div>
-          <div style={{ lineHeight: 1.25 }}>
-            <b style={{ color: "#fff", fontSize: "13.5px" }}>Aarav Mehta</b>
+          <div>
+            <b style={{ color: "#F5F2ED", fontSize: "13.5px", fontWeight: 600 }}>Aarav Mehta</b>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
-              <span className="live" style={{ width: "6px", height: "6px" }}></span>
-              <span className="sm mut" style={{ color: "#9CA3AF" }}>Product Lead</span>
+              <span className="hero-tag-dot" style={{ width: "6px", height: "6px" }}></span>
+              <span style={{ fontSize: "11.5px", color: "#A39B92" }}>Design Lead</span>
             </div>
           </div>
-          <div className="stage-badge">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="slate-badge">
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            <span>256-bit Encrypted</span>
+            <span>Verified Peer</span>
           </div>
         </div>
 
         {/* Incoming Bubble */}
-        <div className="b">
-          Hey team! Dropping the final ConnectX design tokens & mocks here 🎨
+        <div className="slate-bubble in">
+          The new palette feels grounded and focused. Charcoal with warm terracotta accents creates an unmistakable presence.
         </div>
 
-        {/* Attachment Card */}
-        <div className="b-file">
-          <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(79,70,229,0.22)", color: "#A5B4FC", display: "grid", placeItems: "center", flexShrink: 0 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
+        {/* Audio / Waveform Transmission Bar */}
+        <div className="slate-audio">
+          <div
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "7px",
+              background: "rgba(217, 139, 112, 0.16)",
+              color: "#D98B70",
+              display: "grid",
+              placeItems: "center",
+              flexShrink: 0,
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
             </svg>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: "12px", fontWeight: "600", color: "#F3F4F6", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              ConnectX_v2_Tokens.fig
-            </div>
-            <div style={{ fontSize: "10.5px", color: "#9CA3AF" }}>4.2 MB • Verified safe</div>
+          <div className="slate-wave" aria-hidden="true">
+            <span style={{ height: "45%", animationDelay: "0.1s" }}></span>
+            <span style={{ height: "75%", animationDelay: "0.3s" }}></span>
+            <span style={{ height: "100%", animationDelay: "0.2s" }}></span>
+            <span style={{ height: "60%", animationDelay: "0.4s" }}></span>
+            <span style={{ height: "85%", animationDelay: "0.15s" }}></span>
+            <span style={{ height: "40%", animationDelay: "0.35s" }}></span>
+            <span style={{ height: "90%", animationDelay: "0.25s" }}></span>
+            <span style={{ height: "50%", animationDelay: "0.05s" }}></span>
           </div>
-          <div style={{ fontSize: "11px", color: "#8F88FF", fontWeight: "500", background: "rgba(143,136,255,0.12)", padding: "2px 7px", borderRadius: "6px" }}>
-            Ready
-          </div>
+          <span style={{ fontSize: "11px", color: "#C2BBB2", fontWeight: 500 }}>
+            0:38
+          </span>
         </div>
 
         {/* Outgoing Bubble */}
-        <div className="b me" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>Looks crisp! Real-time receipts & sync feel instant ⚡</span>
-          <span style={{ fontSize: "11px", color: "#C7D2FE", display: "inline-flex", alignItems: "center" }} title="Read">
+        <div className="slate-bubble out">
+          <span>Agreed. It feels like an instrument rather than a template.</span>
+          <span
+            style={{
+              fontSize: "11px",
+              marginLeft: "8px",
+              opacity: 0.85,
+              fontWeight: 600,
+            }}
+            title="Delivered and Read"
+          >
             ✓✓
           </span>
         </div>
 
-        {/* Micro-metrics Footer */}
-        <div className="stage-foot">
-          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span style={{ color: "#F59E0B" }}>⚡</span> 12ms latency
-          </span>
-          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span style={{ color: "#3B82F6" }}>🛡️</span> Multi-device
-          </span>
-          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span style={{ color: "#10B981" }}>✓✓</span> Instant receipts
-          </span>
+        {/* Slate Metrics Footer */}
+        <div className="slate-footer">
+          <span>Signal: Lossless</span>
+          <span>•</span>
+          <span>Keys: Ephemeral</span>
+          <span>•</span>
+          <span>Latency: 11ms</span>
         </div>
       </div>
 
-      {/* Feature Chips */}
-      <div className="chips">
-        <span>End-to-end encrypted</span>
-        <span>Zero spam</span>
-        <span>Multi-device sync</span>
-        <span>Read receipts</span>
+      {/* 3-Column Editorial Pillars */}
+      <div className="hero-pillars">
+        <div className="pillar">
+          <span className="pillar-num">01</span>
+          <h4>High Signal</h4>
+          <p>Pure chronological stream with zero algorithmic clutter.</p>
+        </div>
+        <div className="pillar">
+          <span className="pillar-num">02</span>
+          <h4>Verified Privacy</h4>
+          <p>Ephemeral keys, hardware encryption, and zero tracking.</p>
+        </div>
+        <div className="pillar">
+          <span className="pillar-num">03</span>
+          <h4>Quiet Restraint</h4>
+          <p>Tactile typography built to respect your attention.</p>
+        </div>
       </div>
     </div>
   );

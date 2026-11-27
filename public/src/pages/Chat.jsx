@@ -18,6 +18,7 @@ import CallModal from "../components/calling/CallModal";
 export default function Chat({ initialTab }) {
   const navigate = useNavigate();
   const socket = useRef();
+  const [socketInstance, setSocketInstance] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
@@ -46,7 +47,7 @@ export default function Chat({ initialTab }) {
     if (currentUser) {
       const uId = String(currentUser._id || currentUser.id || "");
 
-      socket.current = io(host, {
+      const sock = io(host, {
         auth: (cb) => {
           const freshToken = getAccessToken() || currentUser.accessToken;
           cb({
@@ -57,19 +58,22 @@ export default function Chat({ initialTab }) {
         withCredentials: true,
       });
 
+      socket.current = sock;
+      setSocketInstance(sock);
+
       if (uId) {
-        socket.current.emit("add-user", uId);
+        sock.emit("add-user", uId);
       }
 
       // Heartbeat pulse to keep presence active
       const hbInterval = setInterval(() => {
-        if (socket.current && socket.current.connected) {
-          socket.current.emit("presence:heartbeat");
+        if (sock && sock.connected) {
+          sock.emit("presence:heartbeat");
         }
       }, 15000);
 
       // Listen for presence updates from other users in real time
-      socket.current.on("presence:update", (presenceData) => {
+      sock.on("presence:update", (presenceData) => {
         if (!presenceData || !presenceData.userId) return;
         const targetId = String(presenceData.userId);
 
@@ -127,13 +131,15 @@ export default function Chat({ initialTab }) {
         );
       };
 
-      socket.current.on("message:receive", handleGlobalReceive);
+      sock.on("message:receive", handleGlobalReceive);
 
       return () => {
         clearInterval(hbInterval);
-        if (socket.current) {
-          socket.current.disconnect();
+        if (sock) {
+          sock.disconnect();
         }
+        socket.current = null;
+        setSocketInstance(null);
       };
     }
   }, [currentUser]);
@@ -217,7 +223,7 @@ export default function Chat({ initialTab }) {
   };
 
   return (
-    <CallProvider currentSocket={socket}>
+    <CallProvider currentSocket={socketInstance || socket}>
       <MainLayout
         currentUser={currentUser}
         currentChat={currentChat}
@@ -225,16 +231,16 @@ export default function Chat({ initialTab }) {
         onSelectChat={handleChatChange}
         onBackToSidebar={handleBackToSidebar}
         onContactsUpdated={loadContacts}
-        socket={socket}
+        socket={socketInstance || socket}
         initialTab={initialTab}
       >
         {currentChat === undefined ? (
           <Welcome />
         ) : (
-          <ChatContainer currentChat={currentChat} socket={socket} />
+          <ChatContainer currentChat={currentChat} socket={socketInstance || socket} />
         )}
       </MainLayout>
-      <CallModal socket={socket} />
+      <CallModal socket={socketInstance || socket} />
     </CallProvider>
   );
 }

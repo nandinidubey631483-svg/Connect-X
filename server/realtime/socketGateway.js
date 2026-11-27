@@ -25,6 +25,7 @@ const UserSettings = require("../models/userSettingsModel");
 const Notification = require("../models/notificationModel");
 const { dispatchNotification } = require("../models/notificationService");
 const { registerCallSignaling } = require("./callSignaling");
+const { validateMessageContent } = require("../utils/validators");
 
 function initSocketGateway(server, options = {}) {
   const MessagesModel = options.messagesModel || Messages;
@@ -170,7 +171,7 @@ function initSocketGateway(server, options = {}) {
       const activeSender = String(sender);
 
       const { conversationId, to, text, message, media, file, clientTempId } = data || {};
-      let content = (text || message || "").trim();
+      let rawText = text || message || "";
       const mediaInput = media || file;
 
       let mediaData = null;
@@ -182,17 +183,19 @@ function initSocketGateway(server, options = {}) {
           const validated = validateMedia(mediaInput);
           mediaData = validated.media;
           messageType = validated.messageType;
-          if (!content) {
-            content = messageType === "IMAGE" ? "[Image]" : `[File] ${mediaData.filename}`;
+          if (!rawText) {
+            rawText = messageType === "IMAGE" ? "[Image]" : `[File] ${mediaData.filename}`;
           }
         } catch (mediaErr) {
           return ack({ success: false, error: mediaErr.code || "INVALID_FILE", message: mediaErr.message });
         }
       }
 
-      if (!content && !mediaData) {
-        return ack({ success: false, error: "VALIDATION_ERROR", message: "Message content cannot be empty" });
+      const msgValidation = validateMessageContent(rawText, 5000);
+      if (!msgValidation.isValid && !mediaData) {
+        return ack({ success: false, error: "VALIDATION_ERROR", message: msgValidation.error || "Message content cannot be empty" });
       }
+      const content = msgValidation.isValid ? msgValidation.sanitized : (rawText ? String(rawText).slice(0, 5000) : "");
 
       let conv = null;
       let recipientId = to;

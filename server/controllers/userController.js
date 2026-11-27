@@ -7,6 +7,12 @@ const { generateRefreshToken, generateSignedCsrfToken } = require("../utils/cryp
 const { signAccessToken } = require("../utils/jwtUtils");
 const { setAuthCookies, clearAuthCookies } = require("../middleware/cookieConfig");
 
+const {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+} = require("../utils/validators");
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const BCRYPT_SALT_ROUNDS = 12;
 
@@ -89,19 +95,37 @@ module.exports.register = async (req, res, next) => {
       return res.json({ msg: "All fields are required", status: false });
     }
 
-    const usernameCheck = await User.findOne({ username });
+    const usernameVal = validateUsername(username);
+    if (!usernameVal.isValid) {
+      return res.json({ msg: usernameVal.error, status: false });
+    }
+
+    const emailVal = validateEmail(email);
+    if (!emailVal.isValid) {
+      return res.json({ msg: emailVal.error, status: false });
+    }
+
+    const passwordVal = validatePassword(password);
+    if (!passwordVal.isValid) {
+      return res.json({ msg: passwordVal.error, status: false });
+    }
+
+    const cleanUsername = usernameVal.sanitized;
+    const cleanEmail = emailVal.sanitized;
+
+    const usernameCheck = await User.findOne({ username: cleanUsername });
     if (usernameCheck) {
       return res.json({ msg: "Username already used", status: false });
     }
-    const emailCheck = await User.findOne({ email });
+    const emailCheck = await User.findOne({ email: cleanEmail });
     if (emailCheck) {
       return res.json({ msg: "Email already used", status: false });
     }
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     const user = await User.create({
-      email,
-      username,
+      email: cleanEmail,
+      username: cleanUsername,
       password: hashedPassword,
     });
 

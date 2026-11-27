@@ -5,8 +5,8 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      min: 3,
-      max: 20,
+      minlength: 3,
+      maxlength: 30,
       unique: true,
       trim: true,
     },
@@ -14,14 +14,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      max: 50,
+      maxlength: 254,
       trim: true,
       lowercase: true,
     },
     password: {
       type: String,
       required: true,
-      min: 8,
+      minlength: 8,
       select: false,
     },
     isAvatarImageSet: {
@@ -35,25 +35,25 @@ const userSchema = new mongoose.Schema(
     // Phase 5 Profile Extensions
     displayName: {
       type: String,
-      max: 50,
+      maxlength: 50,
       trim: true,
       default: "",
     },
     bio: {
       type: String,
-      max: 250,
+      maxlength: 250,
       trim: true,
       default: "",
     },
     phoneNumber: {
       type: String,
-      max: 20,
+      maxlength: 20,
       trim: true,
       default: "",
     },
     statusMessage: {
       type: String,
-      max: 100,
+      maxlength: 100,
       trim: true,
       default: "Hey there! I am using ConnectX.",
     },

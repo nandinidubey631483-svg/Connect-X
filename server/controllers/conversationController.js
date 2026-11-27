@@ -15,6 +15,7 @@
 const User = require("../models/userModel");
 const Conversation = require("../models/conversationModel");
 const AppError = require("../utils/appError");
+const { isValidObjectId } = require("../utils/validators");
 
 function getParticipantHash(userId1, userId2) {
   return [userId1.toString(), userId2.toString()].sort().join(":");
@@ -34,6 +35,10 @@ async function createOrGetConversation(req, res, next) {
     const participantId = req.body.participantId || req.body.recipientId;
     if (!participantId) {
       return next(new AppError("Participant ID is required", 400, "VALIDATION_ERROR"));
+    }
+
+    if (!isValidObjectId(participantId)) {
+      return next(new AppError("Invalid participant ID format", 400, "VALIDATION_ERROR"));
     }
 
     if (userId.toString() === participantId.toString()) {
@@ -191,6 +196,9 @@ async function markConversationRead(req, res, next) {
     }
 
     const { conversationId } = req.params;
+    if (!conversationId || !isValidObjectId(conversationId)) {
+      return next(new AppError("Invalid conversation ID format", 400, "VALIDATION_ERROR"));
+    }
     const conversation = await Conversation.findById(conversationId);
 
     if (!conversation) {

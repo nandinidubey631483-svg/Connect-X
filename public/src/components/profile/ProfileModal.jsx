@@ -10,6 +10,7 @@ import {
   MODERN_AVATARS,
   resizeImageToSquare,
 } from "../../utils/avatarUtils";
+import { validateUsername, PHONE_REGEX } from "../../utils/validators";
 
 export default function ProfileModal({ isOpen, onClose }) {
   const { user, updateUser } = useAuth();
@@ -77,6 +78,16 @@ export default function ProfileModal({ isOpen, onClose }) {
     // Reset file input value so same file can be re-selected if desired
     e.target.value = "";
 
+    if (!file.type || !file.type.startsWith("image/")) {
+      toast.error("Selected file must be an image (JPEG, PNG, WebP, GIF)");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Selected image exceeds 10MB limit");
+      return;
+    }
+
     try {
       setIsAvatarUpdating(true);
       const compressedDataUrl = await resizeImageToSquare(file, 256, 0.9);
@@ -143,6 +154,31 @@ export default function ProfileModal({ isOpen, onClose }) {
   const handleSave = async (e) => {
     e.preventDefault();
     if (isSaving) return;
+
+    if (formData.displayName && formData.displayName.length > 50) {
+      toast.error("Display name must be 50 characters or less");
+      return;
+    }
+    if (formData.bio && formData.bio.length > 250) {
+      toast.error("Bio must be 250 characters or less");
+      return;
+    }
+    if (formData.phoneNumber && !PHONE_REGEX.test(formData.phoneNumber.trim())) {
+      toast.error("Please provide a valid phone number");
+      return;
+    }
+    if (formData.statusMessage && formData.statusMessage.length > 100) {
+      toast.error("Status message must be 100 characters or less");
+      return;
+    }
+    if (formData.username && formData.username !== user?.username) {
+      const uVal = validateUsername(formData.username);
+      if (!uVal.isValid) {
+        toast.error(uVal.error);
+        return;
+      }
+    }
+
     setIsSaving(true);
 
     try {

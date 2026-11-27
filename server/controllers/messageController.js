@@ -17,6 +17,7 @@ const Conversation = require("../models/conversationModel");
 const UserSettings = require("../models/userSettingsModel");
 const { dispatchNotification } = require("../models/notificationService");
 const AppError = require("../utils/appError");
+const { validateMessageContent, isValidObjectId } = require("../utils/validators");
 
 const STATUS_WEIGHT = {
   SENT: 1,
@@ -53,7 +54,8 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 
 const DANGEROUS_EXTENSIONS = new Set([
-  "exe", "bat", "cmd", "sh", "msi", "com", "vbs", "ps1", "scr", "jar", "bin"
+  "exe", "bat", "cmd", "sh", "msi", "com", "vbs", "ps1", "scr", "jar", "bin",
+  "php", "phtml", "py", "js", "html", "htm", "shtml", "cgi", "pl", "vbe", "wsf"
 ]);
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -240,7 +242,7 @@ async function sendMessage(req, res, next) {
     }
 
     const { conversationId, to, text, message, media, file } = req.body || {};
-    let content = (text || message || "").trim();
+    let rawText = text || message || "";
     const mediaInput = media || file;
 
     let mediaData = null;
@@ -250,13 +252,22 @@ async function sendMessage(req, res, next) {
       const validated = validateMedia(mediaInput);
       mediaData = validated.media;
       messageType = validated.messageType;
-      if (!content) {
-        content = messageType === "IMAGE" ? "[Image]" : `[File] ${mediaData.filename}`;
+      if (!rawText) {
+        rawText = messageType === "IMAGE" ? "[Image]" : `[File] ${mediaData.filename}`;
       }
     }
 
-    if (!content && !mediaData) {
-      return next(new AppError("Message content cannot be empty", 400, "VALIDATION_ERROR"));
+    const msgValidation = validateMessageContent(rawText, 5000);
+    if (!msgValidation.isValid && !mediaData) {
+      return next(new AppError(msgValidation.error || "Message content cannot be empty", 400, "VALIDATION_ERROR"));
+    }
+    const content = msgValidation.isValid ? msgValidation.sanitized : (rawText ? String(rawText).slice(0, 5000) : "");
+
+    if (conversationId && !isValidObjectId(conversationId)) {
+      return next(new AppError("Invalid conversation ID format", 400, "VALIDATION_ERROR"));
+    }
+    if (to && !isValidObjectId(to)) {
+      return next(new AppError("Invalid recipient user ID format", 400, "VALIDATION_ERROR"));
     }
 
     let conversation = null;

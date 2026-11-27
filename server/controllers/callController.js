@@ -8,6 +8,7 @@ const Call = require("../models/callModel");
 const User = require("../models/userModel");
 const Conversation = require("../models/conversationModel");
 const AppError = require("../utils/appError");
+const { isValidObjectId } = require("../utils/validators");
 
 /**
  * GET /api/v1/calls/ice-servers
@@ -197,6 +198,14 @@ async function initiateCall(req, res, next) {
 
     if (!receiverId) {
       return next(new AppError("Receiver ID is required to initiate a call", 400, "VALIDATION_ERROR"));
+    }
+
+    if (!isValidObjectId(receiverId)) {
+      return next(new AppError("Invalid receiver ID format", 400, "VALIDATION_ERROR"));
+    }
+
+    if (conversationId && !isValidObjectId(conversationId)) {
+      return next(new AppError("Invalid conversation ID format", 400, "VALIDATION_ERROR"));
     }
 
     if (String(userId) === String(receiverId)) {

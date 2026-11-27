@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Picker from "emoji-picker-react";
 import { FiPaperclip, FiSmile, FiSend, FiX } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { validateFileUpload } from "../utils/validators";
 
 const QUICK_REPLIES = ["Sounds good! 👍", "On my way 🚀", "Let's sync later today."];
 
@@ -23,8 +25,10 @@ export default function ChatInput({ handleSendMsg }) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("File size exceeds 5MB limit");
+    const fileVal = validateFileUpload(file, { maxSizeBytes: 5 * 1024 * 1024 });
+    if (!fileVal.isValid) {
+      toast.error(fileVal.error);
+      e.target.value = "";
       return;
     }
 
@@ -44,8 +48,14 @@ export default function ChatInput({ handleSendMsg }) {
 
   const sendChat = (event) => {
     if (event) event.preventDefault();
-    if (msg.trim().length > 0 || selectedFile) {
-      handleSendMsg(msg, selectedFile);
+    const trimmed = msg.trim();
+    if (trimmed.length > 5000) {
+      toast.error("Message exceeds maximum length of 5000 characters");
+      return;
+    }
+
+    if (trimmed.length > 0 || selectedFile) {
+      handleSendMsg(trimmed, selectedFile);
       setMsg("");
       setSelectedFile(null);
       setShowEmojiPicker(false);
@@ -202,6 +212,7 @@ export default function ChatInput({ handleSendMsg }) {
           placeholder="type your message here"
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
+          maxLength={5000}
           style={{
             flex: 1,
             border: "none",

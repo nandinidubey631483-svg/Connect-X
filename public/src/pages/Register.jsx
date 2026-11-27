@@ -9,6 +9,15 @@ import OtpVerification from "../components/auth/OtpVerification";
 import apiClient from "../services/apiClient";
 import { v1AuthRoute } from "../services/apiRoutes";
 import LogoImg from "../assets/connectx-logo.png";
+import {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  calculatePasswordStrength,
+  RESERVED_USERNAMES,
+  EMAIL_REGEX,
+  USERNAME_REGEX,
+} from "../utils/validators";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -45,15 +54,35 @@ export default function Register() {
     } else if (username.length < 3) {
       toast.error("Username should be greater than 3 characters.", toastOptions);
       return false;
+    } else if (username.length > 30) {
+      toast.error("Username cannot exceed 30 characters.", toastOptions);
+      return false;
+    } else if (!USERNAME_REGEX.test(username)) {
+      toast.error("Username can only contain letters, numbers, underscores, and hyphens.", toastOptions);
+      return false;
+    } else if (RESERVED_USERNAMES.has(username.toLowerCase())) {
+      toast.error("This username is reserved and cannot be registered.", toastOptions);
+      return false;
     } else if (password.length < 8) {
       toast.error("Password should be equal or greater than 8 characters.", toastOptions);
+      return false;
+    } else if (password.length > 128) {
+      toast.error("Password cannot exceed 128 characters.", toastOptions);
+      return false;
+    } else if (!/[a-zA-Z]/.test(password) || !/[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password)) {
+      toast.error("Password must contain at least one letter and at least one number or special character.", toastOptions);
       return false;
     } else if (email === "") {
       toast.error("Email is required.", toastOptions);
       return false;
+    } else if (!EMAIL_REGEX.test(email)) {
+      toast.error("Please enter a valid email address.", toastOptions);
+      return false;
     }
     return true;
   };
+
+  const passwordStrength = calculatePasswordStrength(values.password);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -200,6 +229,31 @@ export default function Register() {
                       autoComplete="new-password"
                       data-testid="register-password"
                     />
+                    {values.password && (
+                      <div style={{ marginTop: "6px" }} data-testid="password-strength-indicator">
+                        <div style={{ display: "flex", gap: "4px", height: "4px", borderRadius: "2px", overflow: "hidden", background: "var(--line, #E2E8F0)" }}>
+                          {[1, 2, 3, 4].map((stepNum) => (
+                            <div
+                              key={stepNum}
+                              style={{
+                                flex: 1,
+                                height: "100%",
+                                background: stepNum <= passwordStrength.score ? passwordStrength.color : "transparent",
+                                transition: "background 0.3s ease",
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px", fontSize: "11px" }}>
+                          <span style={{ color: passwordStrength.color, fontWeight: "600" }}>
+                            Strength: {passwordStrength.label}
+                          </span>
+                          <span className="mut" style={{ fontSize: "11px" }}>
+                            Min 8 characters, letters & numbers
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="fld">
@@ -215,6 +269,15 @@ export default function Register() {
                       autoComplete="new-password"
                       data-testid="register-confirm-password"
                     />
+                    {values.confirmPassword && (
+                      <div style={{ marginTop: "4px", fontSize: "11px" }}>
+                        {values.password === values.confirmPassword ? (
+                          <span style={{ color: "#10B981", fontWeight: "600" }}>✓ Passwords match</span>
+                        ) : (
+                          <span style={{ color: "#EF4444", fontWeight: "600" }}>✕ Passwords do not match</span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <label className="chk" style={{ display: "flex", gap: "8px", alignItems: "center", margin: "10px 0" }}>

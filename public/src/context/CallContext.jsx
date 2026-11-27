@@ -93,11 +93,32 @@ export function CallProvider({ children, currentSocket }) {
   }, []);
 
   /**
+   * Safely resolves a functional Socket.io client instance
+   */
+  const resolveSocket = useCallback(
+    (explicitSocket) => {
+      const candidates = [
+        explicitSocket,
+        explicitSocket?.current,
+        currentSocket,
+        currentSocket?.current,
+      ];
+      for (const c of candidates) {
+        if (c && typeof c.on === "function" && typeof c.emit === "function") {
+          return c;
+        }
+      }
+      return null;
+    },
+    [currentSocket]
+  );
+
+  /**
    * INITIATE CALL (Voice or Video)
    */
   const startCall = useCallback(
     async ({ targetUser, callType = "VOICE", conversationId, socket }) => {
-      const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
+      const activeSock = resolveSocket(socket);
       if (!activeSock) {
         setErrorMessage("Network socket not ready");
         setCallState(CALL_STATES.FAILED);
@@ -214,7 +235,7 @@ export function CallProvider({ children, currentSocket }) {
    */
   const acceptCall = useCallback(
     async (socket) => {
-      const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
+      const activeSock = resolveSocket(socket);
       if (!activeCallRef.current || !activeSock) return;
 
       const { callId, callType, caller, otherUser, offer } = activeCallRef.current;
@@ -274,7 +295,7 @@ export function CallProvider({ children, currentSocket }) {
         resetCallState(3000);
       }
     },
-    [currentSocket, resetCallState]
+    [resolveSocket, resetCallState]
   );
 
   /**
@@ -282,7 +303,7 @@ export function CallProvider({ children, currentSocket }) {
    */
   const rejectCall = useCallback(
     (socket) => {
-      const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
+      const activeSock = resolveSocket(socket);
       if (activeCallRef.current?.callId && activeSock) {
         activeSock.emit("call:reject", { callId: activeCallRef.current.callId });
       }
@@ -290,7 +311,7 @@ export function CallProvider({ children, currentSocket }) {
       setStatusMessage("Call declined");
       resetCallState(1500);
     },
-    [currentSocket, resetCallState]
+    [resolveSocket, resetCallState]
   );
 
   /**
@@ -298,7 +319,7 @@ export function CallProvider({ children, currentSocket }) {
    */
   const cancelCall = useCallback(
     (socket) => {
-      const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
+      const activeSock = resolveSocket(socket);
       if (activeCallRef.current?.callId && activeSock) {
         activeSock.emit("call:cancel", { callId: activeCallRef.current.callId });
       }
@@ -306,7 +327,7 @@ export function CallProvider({ children, currentSocket }) {
       setStatusMessage("Call cancelled");
       resetCallState(1500);
     },
-    [currentSocket, resetCallState]
+    [resolveSocket, resetCallState]
   );
 
   /**
@@ -314,7 +335,7 @@ export function CallProvider({ children, currentSocket }) {
    */
   const endCall = useCallback(
     (socket, reason = "NORMAL") => {
-      const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
+      const activeSock = resolveSocket(socket);
       if (activeCallRef.current?.callId && activeSock) {
         activeSock.emit("call:end", { callId: activeCallRef.current.callId, reason: reason || "NORMAL" });
       }
@@ -322,7 +343,7 @@ export function CallProvider({ children, currentSocket }) {
       setStatusMessage("Call ended");
       resetCallState(1500);
     },
-    [currentSocket, resetCallState]
+    [resolveSocket, resetCallState]
   );
 
   /**
@@ -331,7 +352,7 @@ export function CallProvider({ children, currentSocket }) {
   const toggleMicrophone = useCallback(() => {
     const muted = webrtcService.toggleMicrophone();
     setIsMuted(muted);
-    const activeSock = currentSocket?.current || currentSocket;
+    const activeSock = resolveSocket();
     if (activeSock && activeCallRef.current) {
       activeSock.emit("call:media_state", {
         callId: activeCallRef.current.callId,
@@ -340,12 +361,12 @@ export function CallProvider({ children, currentSocket }) {
         isCameraOff,
       });
     }
-  }, [currentSocket, isCameraOff]);
+  }, [resolveSocket, isCameraOff]);
 
   const toggleCamera = useCallback(() => {
     const camOff = webrtcService.toggleCamera();
     setIsCameraOff(camOff);
-    const activeSock = currentSocket?.current || currentSocket;
+    const activeSock = resolveSocket();
     if (activeSock && activeCallRef.current) {
       activeSock.emit("call:media_state", {
         callId: activeCallRef.current.callId,
@@ -354,7 +375,7 @@ export function CallProvider({ children, currentSocket }) {
         isCameraOff: camOff,
       });
     }
-  }, [currentSocket, isMuted]);
+  }, [resolveSocket, isMuted]);
 
   const switchCamera = useCallback(async () => {
     return await webrtcService.switchCamera();
@@ -364,13 +385,16 @@ export function CallProvider({ children, currentSocket }) {
    * SOCKET EVENT SUBSCRIPTIONS
    */
   useEffect(() => {
-    const activeSock = currentSocket?.current || currentSocket;
-    if (!activeSock || typeof activeSock.on !== "function") return;
+    let boundSocket = null;
+    let isMounted = true;
 
     // Incoming Call
     const handleIncomingCall = (payload) => {
+      const activeSock = resolveSocket();
       if (callStateRef.current !== CALL_STATES.IDLE) {
-        activeSock.emit("call:busy", { callId: payload.callId, reason: "BUSY" });
+        if (activeSock) {
+          activeSock.emit("call:busy", { callId: payload.callId, reason: "BUSY" });
+        }
         return;
       }
       setActiveCall({
@@ -438,7 +462,8 @@ export function CallProvider({ children, currentSocket }) {
 
     // WebRTC Offer/Answer/ICE
     const handleRemoteOffer = async (payload) => {
-      if (payload.offer) {
+      const activeSock = resolveSocket();
+      if (payload.offer && activeSock) {
         const answer = await webrtcService.handleOfferAndCreateAnswer(payload.offer);
         activeSock.emit("call:answer", {
           callId: payload.callId,
@@ -462,39 +487,73 @@ export function CallProvider({ children, currentSocket }) {
 
     // Remote media state updates
     const handleRemoteMediaState = (payload) => {
-      // Could show toast or indicator "Remote user muted their microphone"
+      // Remote user muted their microphone or camera
     };
 
-    activeSock.on("call:incoming", handleIncomingCall);
-    activeSock.on("call:ringing", handleRinging);
-    activeSock.on("call:accepted", handleAccepted);
-    activeSock.on("call:rejected", handleRejected);
-    activeSock.on("call:cancelled", handleCancelled);
-    activeSock.on("call:busy", handleBusy);
-    activeSock.on("call:missed", handleMissed);
-    activeSock.on("call:ended", handleEnded);
-    activeSock.on("call:offer", handleRemoteOffer);
-    activeSock.on("call:answer", handleRemoteAnswer);
-    activeSock.on("call:ice_candidate", handleRemoteIceCandidate);
-    activeSock.on("call:media_state", handleRemoteMediaState);
+    const setupListeners = (sock) => {
+      if (!sock || typeof sock.on !== "function") return;
+      boundSocket = sock;
 
-    return () => {
-      if (typeof activeSock.off === "function") {
-        activeSock.off("call:incoming", handleIncomingCall);
-        activeSock.off("call:ringing", handleRinging);
-        activeSock.off("call:accepted", handleAccepted);
-        activeSock.off("call:rejected", handleRejected);
-        activeSock.off("call:cancelled", handleCancelled);
-        activeSock.off("call:busy", handleBusy);
-        activeSock.off("call:missed", handleMissed);
-        activeSock.off("call:ended", handleEnded);
-        activeSock.off("call:offer", handleRemoteOffer);
-        activeSock.off("call:answer", handleRemoteAnswer);
-        activeSock.off("call:ice_candidate", handleRemoteIceCandidate);
-        activeSock.off("call:media_state", handleRemoteMediaState);
+      sock.on("call:incoming", handleIncomingCall);
+      sock.on("call:ringing", handleRinging);
+      sock.on("call:accepted", handleAccepted);
+      sock.on("call:rejected", handleRejected);
+      sock.on("call:cancelled", handleCancelled);
+      sock.on("call:busy", handleBusy);
+      sock.on("call:missed", handleMissed);
+      sock.on("call:ended", handleEnded);
+      sock.on("call:offer", handleRemoteOffer);
+      sock.on("call:answer", handleRemoteAnswer);
+      sock.on("call:ice_candidate", handleRemoteIceCandidate);
+      sock.on("call:media_state", handleRemoteMediaState);
+    };
+
+    const cleanupListeners = () => {
+      if (boundSocket && typeof boundSocket.off === "function") {
+        boundSocket.off("call:incoming", handleIncomingCall);
+        boundSocket.off("call:ringing", handleRinging);
+        boundSocket.off("call:accepted", handleAccepted);
+        boundSocket.off("call:rejected", handleRejected);
+        boundSocket.off("call:cancelled", handleCancelled);
+        boundSocket.off("call:busy", handleBusy);
+        boundSocket.off("call:missed", handleMissed);
+        boundSocket.off("call:ended", handleEnded);
+        boundSocket.off("call:offer", handleRemoteOffer);
+        boundSocket.off("call:answer", handleRemoteAnswer);
+        boundSocket.off("call:ice_candidate", handleRemoteIceCandidate);
+        boundSocket.off("call:media_state", handleRemoteMediaState);
+        boundSocket = null;
       }
     };
-  }, [currentSocket, resetCallState]);
+
+    const initialSock = resolveSocket();
+    if (initialSock) {
+      setupListeners(initialSock);
+    } else {
+      const intervalId = setInterval(() => {
+        if (!isMounted) {
+          clearInterval(intervalId);
+          return;
+        }
+        const found = resolveSocket();
+        if (found) {
+          clearInterval(intervalId);
+          setupListeners(found);
+        }
+      }, 300);
+
+      return () => {
+        isMounted = false;
+        clearInterval(intervalId);
+        cleanupListeners();
+      };
+    }
+
+    return () => {
+      isMounted = false;
+      cleanupListeners();
+    };
+  }, [resolveSocket, resetCallState]);
 
   const value = {
     callState,

@@ -39,6 +39,16 @@ export default function SetAvatar() {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
+    if (!file.type || !file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPEG, WebP, GIF)", toastOptions);
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Selected image exceeds 10MB limit", toastOptions);
+      return;
+    }
+
     try {
       const compressedDataUrl = await resizeImageToSquare(file, 256, 0.9);
       setCustomPhoto(compressedDataUrl);

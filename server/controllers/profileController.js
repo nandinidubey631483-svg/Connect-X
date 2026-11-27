@@ -13,6 +13,11 @@
  */
 const User = require("../models/userModel");
 const AppError = require("../utils/appError");
+const {
+  validateUsername,
+  validateProfileFields,
+  sanitizeString,
+} = require("../utils/validators");
 
 function sanitizeProfile(userDoc) {
   const obj = userDoc.toObject ? userDoc.toObject() : { ...userDoc };
@@ -62,42 +67,21 @@ async function updateMyProfile(req, res, next) {
 
     const { displayName, bio, phoneNumber, statusMessage, username } = req.body || {};
 
-    const updates = {};
-    if (displayName !== undefined) {
-      if (typeof displayName !== "string" || displayName.length > 50) {
-        return next(new AppError("Display name must be 50 characters or less", 400, "VALIDATION_ERROR"));
-      }
-      updates.displayName = displayName.trim();
+    const profileVal = validateProfileFields({ displayName, bio, phoneNumber, statusMessage });
+    if (!profileVal.isValid) {
+      return next(new AppError(profileVal.errors[0] || "Invalid profile data", 400, "VALIDATION_ERROR"));
     }
 
-    if (bio !== undefined) {
-      if (typeof bio !== "string" || bio.length > 250) {
-        return next(new AppError("Bio must be 250 characters or less", 400, "VALIDATION_ERROR"));
-      }
-      updates.bio = bio.trim();
-    }
-
-    if (phoneNumber !== undefined) {
-      if (typeof phoneNumber !== "string" || phoneNumber.length > 20) {
-        return next(new AppError("Phone number must be 20 characters or less", 400, "VALIDATION_ERROR"));
-      }
-      updates.phoneNumber = phoneNumber.trim();
-    }
-
-    if (statusMessage !== undefined) {
-      if (typeof statusMessage !== "string" || statusMessage.length > 100) {
-        return next(new AppError("Status message must be 100 characters or less", 400, "VALIDATION_ERROR"));
-      }
-      updates.statusMessage = statusMessage.trim();
-    }
+    const updates = { ...profileVal.cleaned };
 
     // Optional username update with uniqueness check
     if (username !== undefined) {
-      const cleanUsername = String(username).trim();
-      if (cleanUsername.length < 3 || cleanUsername.length > 20) {
-        return next(new AppError("Username must be between 3 and 20 characters", 400, "VALIDATION_ERROR"));
+      const usernameVal = validateUsername(username);
+      if (!usernameVal.isValid) {
+        return next(new AppError(usernameVal.error, 400, "VALIDATION_ERROR"));
       }
 
+      const cleanUsername = usernameVal.sanitized;
       // Check if username is taken by another user
       const existing = await User.findOne({ username: cleanUsername, _id: { $ne: userId } });
       if (existing) {

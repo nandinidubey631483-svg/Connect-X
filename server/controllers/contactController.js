@@ -22,6 +22,7 @@ const Contact = require("../models/contactModel");
 const ContactRequest = require("../models/contactRequestModel");
 const { dispatchNotification } = require("../models/notificationService");
 const AppError = require("../utils/appError");
+const { isValidObjectId } = require("../utils/validators");
 
 /**
  * GET /api/v1/contacts/search
@@ -143,6 +144,10 @@ async function sendContactRequest(req, res, next) {
       return next(new AppError("Recipient ID is required", 400, "VALIDATION_ERROR"));
     }
 
+    if (!isValidObjectId(recipientId)) {
+      return next(new AppError("Invalid recipient ID format", 400, "VALIDATION_ERROR"));
+    }
+
     if (requesterId.toString() === recipientId.toString()) {
       return next(new AppError("Cannot send contact request to yourself", 400, "SELF_REQUEST_PROHIBITED"));
     }
@@ -253,6 +258,9 @@ async function acceptContactRequest(req, res, next) {
     }
 
     const { requestId } = req.params;
+    if (!requestId || !isValidObjectId(requestId)) {
+      return next(new AppError("Invalid contact request ID format", 400, "VALIDATION_ERROR"));
+    }
     const request = await ContactRequest.findById(requestId);
     if (!request) {
       return next(new AppError("Contact request not found", 404, "REQUEST_NOT_FOUND"));
@@ -321,6 +329,9 @@ async function rejectContactRequest(req, res, next) {
     }
 
     const { requestId } = req.params;
+    if (!requestId || !isValidObjectId(requestId)) {
+      return next(new AppError("Invalid contact request ID format", 400, "VALIDATION_ERROR"));
+    }
     const request = await ContactRequest.findById(requestId);
     if (!request) {
       return next(new AppError("Contact request not found", 404, "REQUEST_NOT_FOUND"));
@@ -360,6 +371,9 @@ async function cancelContactRequest(req, res, next) {
     }
 
     const { requestId } = req.params;
+    if (!requestId || !isValidObjectId(requestId)) {
+      return next(new AppError("Invalid contact request ID format", 400, "VALIDATION_ERROR"));
+    }
     const request = await ContactRequest.findById(requestId);
     if (!request) {
       return next(new AppError("Contact request not found", 404, "REQUEST_NOT_FOUND"));
