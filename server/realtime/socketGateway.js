@@ -123,43 +123,6 @@ function initSocketGateway(server, options = {}) {
     // Module 11: Real-Time Call Signaling Gateway
     registerCallSignaling(io, socket, options);
 
-    // Legacy event: register user socket
-    // Identity Spoofing Protection: Client-supplied userId MUST match authenticated socket identity!
-    socket.on("add-user", (clientUserId) => {
-      const activeId = authenticatedUserId || (socket.user && socket.user.userId) || clientUserId;
-      if (!activeId) return;
-
-      if (authenticatedUserId && clientUserId && String(clientUserId) !== String(authenticatedUserId)) {
-        socket.emit("auth-error", {
-          code: "IDENTITY_SPOOF_ATTEMPT",
-          message: "Client supplied user ID does not match authenticated token.",
-        });
-        return;
-      }
-
-      const strId = String(activeId);
-      if (!socket.user) {
-        socket.user = { userId: strId };
-      }
-      socket.join(`user:${strId}`);
-
-      if (!userSockets.has(strId)) {
-        userSockets.set(strId, new Set());
-      }
-      userSockets.get(strId).add(socket.id);
-      onlineUsers.set(strId, socket.id);
-
-      presenceEngine.registerConnection(strId, socket.id).then(({ isFirstSession }) => {
-        if (isFirstSession) {
-          socket.broadcast.emit("presence:update", {
-            userId: strId,
-            isOnline: true,
-            lastSeen: new Date(),
-          });
-        }
-      }).catch(() => {});
-    });
-
     // Phase 5 Module 6 & 8: Real-time message sending with reliable DB persistence before broadcast
     socket.on("message:send", async (data, callback) => {
       const ack = typeof callback === "function" ? callback : () => {};

@@ -27,14 +27,24 @@ function registerCallSignaling(io, socket, options = {}) {
   const activeCallsMap = options.activeCallsMap || activeUserCalls;
   const timeoutsMap = options.timeoutsMap || ringingTimeouts;
 
-  const authenticatedUserId = String(socket.user && socket.user.userId || "");
-  if (!authenticatedUserId) return;
+  const getActiveUserId = () => {
+    return String((socket.user && socket.user.userId) || socket.handshake?.auth?.userId || socket.handshake?.query?.userId || "");
+  };
 
   /**
    * Helper to safely emit to all sockets belonging to a user
    */
   const emitToUser = (targetUserId, eventName, payload) => {
-    io.to(`user:${targetUserId}`).emit(eventName, payload);
+    const targetStr = String(targetUserId);
+    io.to(`user:${targetStr}`).emit(eventName, payload);
+
+    // Also target direct socket IDs from global.userSockets if available
+    if (global.userSockets && global.userSockets.has(targetStr)) {
+      const socketSet = global.userSockets.get(targetStr);
+      for (const sId of socketSet) {
+        io.to(sId).emit(eventName, payload);
+      }
+    }
   };
 
   /**
@@ -43,7 +53,14 @@ function registerCallSignaling(io, socket, options = {}) {
   socket.on("call:initiate", async (data, callback) => {
     try {
       const { receiverId, callType = "VOICE", conversationId, offer } = data || {};
-      const callerId = authenticatedUserId;
+      const callerId = getActiveUserId();
+
+      if (!callerId) {
+        if (typeof callback === "function") {
+          return callback({ success: false, error: "Authentication required" });
+        }
+        return socket.emit("call:error", { message: "Authentication required" });
+      }
 
       if (!receiverId || String(receiverId) === String(callerId)) {
         if (typeof callback === "function") {
