@@ -32,21 +32,40 @@ export default function AuthBackground() {
     resize();
 
     // Floating warm ambient particles
-    const particleCount = Math.min(Math.floor((width * height) / 38000), 38);
+    const particleCount = Math.min(Math.floor((width * height) / 30000), 45);
     const particles = [];
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        r: Math.random() * 2.2 + 0.8,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: -Math.random() * 0.45 - 0.15, // gentle upward drift
+        r: Math.random() * 2.2 + 0.9,
+        vx: (Math.random() - 0.5) * 0.32,
+        vy: -Math.random() * 0.42 - 0.12, // gentle upward drift
         alpha: Math.random() * 0.45 + 0.15,
         baseAlpha: Math.random() * 0.45 + 0.15,
         pulseSpeed: Math.random() * 0.02 + 0.01,
         phase: Math.random() * Math.PI * 2,
       });
     }
+
+    // Occasional shooting stardust embers
+    const shootingStars = [];
+    let nextSpawnTime = performance.now() + 1800;
+
+    const spawnShootingStar = (now) => {
+      const angle = (Math.PI / 6) + (Math.random() - 0.5) * 0.3; // diagonal
+      const speed = Math.random() * 4 + 4;
+      shootingStars.push({
+        x: Math.random() * width * 0.7,
+        y: Math.random() * height * 0.4,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        len: Math.random() * 45 + 25,
+        alpha: 0.7,
+        decay: Math.random() * 0.015 + 0.012,
+      });
+      nextSpawnTime = now + Math.random() * 3500 + 2500;
+    };
 
     let mouse = { x: width * 0.5, y: height * 0.5, active: false };
     const onMouseMove = (e) => {
@@ -71,6 +90,44 @@ export default function AuthBackground() {
       const isDark = document.documentElement.getAttribute("data-theme") === "dark";
       const terracotta = isDark ? "224, 152, 127" : "217, 139, 112";
 
+      // Spawn shooting stars periodically
+      if (now > nextSpawnTime) {
+        spawnShootingStar(now);
+      }
+
+      // Draw and update shooting stars
+      for (let s = shootingStars.length - 1; s >= 0; s--) {
+        const star = shootingStars[s];
+        star.x += star.vx;
+        star.y += star.vy;
+        star.alpha -= star.decay;
+
+        if (star.alpha <= 0 || star.x > width + 50 || star.y > height + 50) {
+          shootingStars.splice(s, 1);
+          continue;
+        }
+
+        const tailX = star.x - (star.vx / Math.hypot(star.vx, star.vy)) * star.len;
+        const tailY = star.y - (star.vy / Math.hypot(star.vx, star.vy)) * star.len;
+
+        const grad = ctx.createLinearGradient(star.x, star.y, tailX, tailY);
+        grad.addColorStop(0, `rgba(${terracotta}, ${star.alpha})`);
+        grad.addColorStop(1, `rgba(${terracotta}, 0)`);
+
+        ctx.beginPath();
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
+        ctx.moveTo(star.x, star.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+
+        // Small head glow
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${terracotta}, ${star.alpha * 1.2})`;
+        ctx.fill();
+      }
+
       // Draw subtle connecting strands between nearby particles
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
@@ -79,13 +136,29 @@ export default function AuthBackground() {
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 110) {
-            const lineAlpha = (1 - dist / 110) * 0.12 * Math.min(p1.alpha, p2.alpha);
+          if (dist < 115) {
+            const lineAlpha = (1 - dist / 115) * 0.14 * Math.min(p1.alpha, p2.alpha);
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${terracotta}, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = 0.85;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+
+        // Draw interactive strand to cursor if nearby
+        if (mouse.active) {
+          const cdx = p1.x - mouse.x;
+          const cdy = p1.y - mouse.y;
+          const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+          if (cdist < 140) {
+            const cursorAlpha = (1 - cdist / 140) * 0.28 * p1.alpha;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${terracotta}, ${cursorAlpha})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(mouse.x, mouse.y);
             ctx.stroke();
           }
         }
@@ -96,16 +169,16 @@ export default function AuthBackground() {
         const p = particles[i];
 
         // Pulse alpha
-        p.alpha = p.baseAlpha + Math.sin(elapsed * 2 + p.phase) * 0.15;
-        p.alpha = Math.max(0.05, Math.min(0.65, p.alpha));
+        p.alpha = p.baseAlpha + Math.sin(elapsed * 2.2 + p.phase) * 0.16;
+        p.alpha = Math.max(0.06, Math.min(0.7, p.alpha));
 
         // Subtle mouse repulsion
         if (mouse.active) {
           const mdx = p.x - mouse.x;
           const mdy = p.y - mouse.y;
           const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-          if (mdist < 140 && mdist > 0) {
-            const force = (1 - mdist / 140) * 0.6;
+          if (mdist < 150 && mdist > 0) {
+            const force = (1 - mdist / 150) * 0.55;
             p.x += (mdx / mdist) * force;
             p.y += (mdy / mdist) * force;
           }
@@ -147,6 +220,15 @@ export default function AuthBackground() {
       <div className="auth-orb auth-orb-1" />
       <div className="auth-orb auth-orb-2" />
       <div className="auth-orb auth-orb-3" />
+      <div className="auth-orb auth-orb-4" />
+
+      {/* Rotating ambient orbital rings */}
+      <div className="auth-ring auth-ring-1" />
+      <div className="auth-ring auth-ring-2" />
+
+      {/* Gentle horizontal ambient aurora glow */}
+      <div className="auth-aurora auth-aurora-top" />
+      <div className="auth-aurora auth-aurora-bottom" />
 
       {/* Subtle modern geometric dot mesh */}
       <div className="auth-bg-grid" />
