@@ -16,7 +16,6 @@ export default function Register() {
   const [step, setStep] = useState("form"); // 'form' | 'otp' | 'done'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
-  const [devOtpCode, setDevOtpCode] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const toastOptions = {
@@ -91,9 +90,6 @@ export default function Register() {
       });
 
       if (res.data && res.data.success) {
-        if (res.data.devCode) {
-          setDevOtpCode(res.data.devCode);
-        }
         setStep("otp");
       }
     } catch (err) {
@@ -268,7 +264,6 @@ export default function Register() {
             {step === "otp" && (
               <OtpVerification
                 email={values.email}
-                devCode={devOtpCode}
                 initialCooldown={30}
                 onVerified={handleOtpVerified}
                 onBack={() => setStep("form")}

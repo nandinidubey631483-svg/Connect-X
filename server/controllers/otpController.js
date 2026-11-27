@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const Otp = require("../models/otpModel");
 const AppError = require("../utils/appError");
+const { sendOtpEmail } = require("../services/emailService");
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 const RESEND_COOLDOWN_MS = 30 * 1000;  // 30 seconds
@@ -72,7 +73,7 @@ async function sendOtp(req, res, next) {
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
     const resendAvailableAt = new Date(Date.now() + RESEND_COOLDOWN_MS);
 
-    await Otp.create({
+    const createdOtp = await Otp.create({
       email: normalizedEmail,
       otpHash,
       purpose,
@@ -82,15 +83,24 @@ async function sendOtp(req, res, next) {
       consumed: false,
     });
 
-    const isDev = process.env.NODE_ENV !== "production";
-    console.log(`[ConnectX OTP] Generated code for ${normalizedEmail} [${purpose}]: ${rawOtp}`);
+    // Deliver OTP email via Nodemailer SMTP service
+    try {
+      await sendOtpEmail({
+        to: normalizedEmail,
+        code: rawOtp,
+        purpose,
+      });
+    } catch (deliveryErr) {
+      // Revert created OTP record if delivery fails so user isn't locked by cooldown
+      await Otp.deleteOne({ _id: createdOtp._id });
+      return next(deliveryErr);
+    }
 
     return res.status(200).json({
       success: true,
       message: `Verification code sent to ${normalizedEmail}.`,
       cooldown: 30,
       expiresIn: 600,
-      devCode: isDev ? rawOtp : undefined,
     });
   } catch (err) {
     next(err);

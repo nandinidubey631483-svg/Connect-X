@@ -65,6 +65,15 @@ function validateEnv() {
       !isNaN(Number(process.env.TRUST_PROXY)) ? Number(process.env.TRUST_PROXY) :
       process.env.TRUST_PROXY
     ) : (nodeEnv === "production" ? 1 : false),
+    smtp: {
+      host: process.env.SMTP_HOST || null,
+      port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
+      secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
+      user: process.env.SMTP_USER || null,
+      pass: process.env.SMTP_PASS || null,
+      from: process.env.EMAIL_FROM || "ConnectX Security <no-reply@connectx.local>",
+      isConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
+    },
   });
 }
 

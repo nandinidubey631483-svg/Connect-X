@@ -4,7 +4,6 @@ import { v1AuthRoute } from "../../services/apiRoutes";
 
 export default function OtpVerification({
   email,
-  devCode = "",
   initialCooldown = 30,
   onVerified,
   onBack,
@@ -16,7 +15,6 @@ export default function OtpVerification({
   const [cooldownSec, setCooldownSec] = useState(initialCooldown);
   const [trustDevice, setTrustDevice] = useState(true);
   const [shake, setShake] = useState(false);
-  const [currentDevCode, setCurrentDevCode] = useState(devCode);
 
   const inputsRef = useRef([]);
 
@@ -149,9 +147,6 @@ export default function OtpVerification({
 
       if (res.data && res.data.success) {
         setCooldownSec(res.data.cooldown || 30);
-        if (res.data.devCode) {
-          setCurrentDevCode(res.data.devCode);
-        }
       }
     } catch (err) {
       const msg = err.response?.data?.error?.message || "Failed to resend code.";
@@ -264,25 +259,6 @@ export default function OtpVerification({
           {cooldownSec > 0 ? `Resend in ${formatTime(cooldownSec)}` : "Resend code"}
         </button>
       </p>
-
-      {currentDevCode && (
-        <div
-          className="hint"
-          style={{
-            border: "1px dashed var(--line)",
-            borderRadius: "10px",
-            padding: "8px 12px",
-            fontSize: "12px",
-            color: "var(--mut)",
-            marginTop: "16px",
-            background: "var(--s2)",
-          }}
-        >
-          Prototype only: your code is{" "}
-          <b style={{ color: "var(--ink)", letterSpacing: "0.1em" }}>{currentDevCode}</b>. In
-          production it’s delivered by email.
-        </div>
-      )}
     </div>
   );
 }

@@ -172,11 +172,15 @@ describe("OTP & CAPTCHA Engine Tests", () => {
       const { req, res, next } = createMockHttp({ body: { email: testEmail } });
       await otpController.sendOtp(req, res, next);
 
+      const emailService = require("../services/emailService");
+      const lastEmail = emailService.getLastDispatchedEmail();
       assert.strictEqual(res.statusCode, 200);
       assert.strictEqual(res.body.success, true);
       assert.strictEqual(res.body.cooldown, 30);
-      assert.ok(res.body.devCode);
-      assert.strictEqual(res.body.devCode.length, 6);
+      assert.strictEqual(res.body.devCode, undefined, "devCode must not be exposed in API response");
+      assert.ok(lastEmail);
+      assert.strictEqual(lastEmail.to, testEmail);
+      assert.strictEqual(lastEmail.code.length, 6);
       assert.ok(createdOtp);
       assert.strictEqual(createdOtp.email, testEmail);
     });

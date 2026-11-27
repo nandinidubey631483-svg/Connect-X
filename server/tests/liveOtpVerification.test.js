@@ -5,6 +5,7 @@ const Otp = require("../models/otpModel");
 const User = require("../models/userModel");
 const otpController = require("../controllers/otpController");
 const authController = require("../controllers/authController");
+const emailService = require("../services/emailService");
 const AppError = require("../utils/appError");
 
 function createMockHttp({ body = {}, ip = "127.0.0.1" } = {}) {
@@ -62,9 +63,11 @@ test("OTP Full End-to-End Lifecycle Verification", async (t) => {
 
   assert.equal(sendHttp.res.statusCode, 200);
   assert.equal(sendHttp.res.body.success, true);
-  assert.ok(sendHttp.res.body.devCode, "devCode should be returned in development");
-  assert.equal(sendHttp.res.body.devCode.length, 6);
-  const otpCode = sendHttp.res.body.devCode;
+  assert.equal(sendHttp.res.body.devCode, undefined, "devCode must not be returned in API response");
+  const lastEmail = emailService.getLastDispatchedEmail();
+  assert.ok(lastEmail, "Email must be dispatched via emailService");
+  assert.equal(lastEmail.code.length, 6);
+  const otpCode = lastEmail.code;
 
   // Verify OTP persisted securely in MongoDB as a hash (not plaintext)
   const otpDoc = await Otp.findOne({ email: testEmail, consumed: false });
@@ -113,7 +116,8 @@ test("OTP Full End-to-End Lifecycle Verification", async (t) => {
   const expiredEmail = `expired_${Date.now()}@test-otp-lifecycle.local`;
   const sendExpHttp = createMockHttp({ body: { email: expiredEmail, purpose: "SIGNUP" } });
   await otpController.sendOtp(sendExpHttp.req, sendExpHttp.res, sendExpHttp.next);
-  const expCode = sendExpHttp.res.body.devCode;
+  assert.equal(sendExpHttp.res.body.devCode, undefined);
+  const expCode = emailService.getLastDispatchedEmail().code;
 
   // Artificially expire the OTP
   await Otp.updateOne({ email: expiredEmail }, { $set: { expiresAt: new Date(Date.now() - 1000) } });
@@ -129,7 +133,8 @@ test("OTP Full End-to-End Lifecycle Verification", async (t) => {
   const validEmail = `valid_${Date.now()}@test-otp-lifecycle.local`;
   const sendValidHttp = createMockHttp({ body: { email: validEmail, purpose: "SIGNUP" } });
   await otpController.sendOtp(sendValidHttp.req, sendValidHttp.res, sendValidHttp.next);
-  const validCode = sendValidHttp.res.body.devCode;
+  assert.equal(sendValidHttp.res.body.devCode, undefined);
+  const validCode = emailService.getLastDispatchedEmail().code;
 
   const verifyValidHttp = createMockHttp({ body: { email: validEmail, code: validCode, purpose: "SIGNUP" } });
   await otpController.verifyOtp(verifyValidHttp.req, verifyValidHttp.res, verifyValidHttp.next);

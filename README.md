@@ -71,6 +71,14 @@ ConnectX is a production-grade, full-stack real-time communication platform buil
    JWT_REFRESH_SECRET="<64-hex-char-secret>"
    CSRF_SECRET="<64-hex-char-secret>"
 
+   # Email Delivery Service (Nodemailer SMTP)
+   SMTP_HOST="smtp.gmail.com"
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER="your_email@gmail.com"
+   SMTP_PASS="your_app_specific_password_or_smtp_token"
+   EMAIL_FROM="ConnectX Security <no-reply@connectx.local>"
+
    # Frontend environment (chat-app-react-nodejs/public/.env)
    REACT_APP_LOCALHOST_KEY="chat-app-current-user"
    REACT_APP_API_URL="http://localhost:5000"
