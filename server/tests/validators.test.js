@@ -26,7 +26,7 @@ const {
 describe("ConnectX Validation & Sanitization Engine Tests", () => {
   describe("1. Username Validation", () => {
     test("accepts valid alphanumeric usernames with hyphens and underscores", () => {
-      const validCases = ["alice", "bob_123", "charlie-dev", "user_name_99", "dev-master-1"];
+      const validCases = ["alice", "bob_123", "charlie-dev", "user_name_99", "dev-master-1", "_alice", "alice_", "muskan.123", "muskan_dubey"];
       for (const u of validCases) {
         const res = validateUsername(u);
         assert.strictEqual(res.isValid, true, `Expected ${u} to be valid`);
@@ -47,8 +47,8 @@ describe("ConnectX Validation & Sanitization Engine Tests", () => {
       assert.ok(res.error.includes("between 3 and 30 characters"));
     });
 
-    test("rejects usernames starting or ending with underscores or hyphens", () => {
-      const invalidBoundaries = ["_alice", "-bob", "alice_", "bob-"];
+    test("rejects usernames starting or ending with dots or hyphens, or consecutive dots", () => {
+      const invalidBoundaries = [".alice", "alice.", "-bob", "bob-", "alice..smith"];
       for (const u of invalidBoundaries) {
         const res = validateUsername(u);
         assert.strictEqual(res.isValid, false, `Expected ${u} to be rejected`);

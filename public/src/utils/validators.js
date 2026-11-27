@@ -33,7 +33,8 @@ export const RESERVED_USERNAMES = new Set([
 export const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
-export const USERNAME_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_-]{1,28}[a-zA-Z0-9]$/;
+// Instagram-style username format: 3-30 chars, alphanumeric, underscores, dots, hyphens (cannot start/end with dot or hyphen, no consecutive dots)
+export const USERNAME_REGEX = /^(?!.*\.\.)(?!^[.-])(?!.*[.-]$)[a-zA-Z0-9._-]{3,30}$/;
 
 export const PHONE_REGEX = /^\+?[0-9\s\-().]{7,20}$/;
 
@@ -84,7 +85,7 @@ export function validateUsername(username) {
   if (!USERNAME_REGEX.test(trimmed)) {
     return {
       isValid: false,
-      error: "Username must contain only letters, numbers, underscores, and hyphens, and cannot start or end with a symbol.",
+      error: "Username must be 3-30 characters with letters, numbers, underscores, or dots (like an Instagram handle), and cannot start or end with a dot or hyphen.",
     };
   }
 

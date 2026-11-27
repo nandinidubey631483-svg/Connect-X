@@ -25,7 +25,7 @@ export default function Register() {
   const [step, setStep] = useState("form"); // 'form' | 'otp' | 'done'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
 
   const toastOptions = {
     position: "bottom-right",
@@ -52,13 +52,13 @@ export default function Register() {
       toast.error("Password and confirm password should be same.", toastOptions);
       return false;
     } else if (username.length < 3) {
-      toast.error("Username should be greater than 3 characters.", toastOptions);
+      toast.error("Username should be at least 3 characters.", toastOptions);
       return false;
     } else if (username.length > 30) {
       toast.error("Username cannot exceed 30 characters.", toastOptions);
       return false;
     } else if (!USERNAME_REGEX.test(username)) {
-      toast.error("Username can only contain letters, numbers, underscores, and hyphens.", toastOptions);
+      toast.error("Username must contain letters, numbers, underscores, or dots (like an Instagram handle).", toastOptions);
       return false;
     } else if (RESERVED_USERNAMES.has(username.toLowerCase())) {
       toast.error("This username is reserved and cannot be registered.", toastOptions);
@@ -187,7 +187,10 @@ export default function Register() {
 
                 <form onSubmit={handleSubmit} data-testid="register-form">
                   <div className="fld">
-                    <label>Username</label>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                      <label style={{ margin: 0 }}>Username</label>
+                      <span className="sm mut" style={{ fontSize: "11px" }}>Instagram style (e.g. muskan_12, dev.01)</span>
+                    </div>
                     <input
                       type="text"
                       className="in"
@@ -199,6 +202,23 @@ export default function Register() {
                       autoComplete="username"
                       data-testid="register-username"
                     />
+                    {values.username && (
+                      <div style={{ marginTop: "4px", fontSize: "11px" }}>
+                        {USERNAME_REGEX.test(values.username) ? (
+                          <span style={{ color: "#10B981", fontWeight: "600" }}>✓ Valid username format</span>
+                        ) : (
+                          <span style={{ color: "#EF4444", fontWeight: "600" }}>
+                            {values.username.length < 3
+                              ? "Min 3 characters"
+                              : values.username.startsWith(".") || values.username.endsWith(".")
+                              ? "Cannot start or end with a dot (.)"
+                              : values.username.includes("..")
+                              ? "No consecutive dots (..)"
+                              : "Allowed: letters, numbers, underscores (_), and dots (.)"}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="fld">
@@ -280,17 +300,46 @@ export default function Register() {
                     )}
                   </div>
 
-                  <label className="chk" style={{ display: "flex", gap: "8px", alignItems: "center", margin: "10px 0" }}>
-                    <input
-                      type="checkbox"
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                      style={{ accentColor: "var(--acc)", width: "16px", height: "16px" }}
-                    />
-                    <span className="sm mut">
+                  <div
+                    className="chk-row"
+                    onClick={() => setTermsAccepted(!termsAccepted)}
+                    role="checkbox"
+                    aria-checked={termsAccepted}
+                    tabIndex={0}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTermsAccepted(!termsAccepted)}
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "center",
+                      margin: "14px 0",
+                      cursor: "pointer",
+                      userSelect: "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "6px",
+                        border: termsAccepted ? "2px solid var(--acc, #D98B70)" : "2px solid var(--mut, #7A756F)",
+                        background: termsAccepted ? "var(--acc, #D98B70)" : "var(--surf, #FFFFFF)",
+                        display: "grid",
+                        placeItems: "center",
+                        transition: "all 0.18s ease",
+                        flexShrink: 0,
+                        boxShadow: termsAccepted ? "0 2px 8px rgba(217, 139, 112, 0.35)" : "none",
+                      }}
+                    >
+                      {termsAccepted && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m5 12.5 4.5 4.5L19 7.5" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="sm mut" style={{ fontSize: "12.5px", lineHeight: "1.4" }}>
                       I agree to the Terms of Service and Privacy Policy
                     </span>
-                  </label>
+                  </div>
 
                   <CaptchaShield
                     isVerified={isCaptchaVerified}

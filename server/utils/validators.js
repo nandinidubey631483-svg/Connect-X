@@ -40,8 +40,8 @@ const RESERVED_USERNAMES = new Set([
 // RFC 5322 compliant regex for practical email validation
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
-// Standard username format: 3-30 chars, alphanumeric + underscores + hyphens, starts/ends with alphanumeric
-const USERNAME_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9_-]{1,28}[a-zA-Z0-9]$/;
+// Instagram-style username format: 3-30 chars, alphanumeric, underscores, dots, hyphens (cannot start/end with dot or hyphen, no consecutive dots)
+const USERNAME_REGEX = /^(?!.*\.\.)(?!^[.-])(?!.*[.-]$)[a-zA-Z0-9._-]{3,30}$/;
 
 // E.164 compatible phone format
 const PHONE_REGEX = /^\+?[0-9\s\-().]{7,20}$/;
@@ -83,7 +83,7 @@ function validateUsername(username) {
   if (!USERNAME_REGEX.test(trimmed)) {
     return {
       isValid: false,
-      error: "Username must contain only letters, numbers, underscores, and hyphens, and cannot start or end with a symbol.",
+      error: "Username must contain only letters, numbers, underscores, dots, or hyphens (like an Instagram handle), and cannot start or end with a dot or hyphen.",
       sanitized: trimmed,
     };
   }
