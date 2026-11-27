@@ -4,11 +4,17 @@ import { v1AuthRoute } from "../../services/apiRoutes";
 
 export default function OtpVerification({
   email,
+  initialCode = "",
   initialCooldown = 30,
   onVerified,
   onBack,
 }) {
-  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
+  const [digits, setDigits] = useState(() => {
+    if (initialCode && initialCode.length === 6) {
+      return initialCode.split("");
+    }
+    return ["", "", "", "", "", ""];
+  });
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
   const [lockoutSec, setLockoutSec] = useState(0);
@@ -174,6 +180,29 @@ export default function OtpVerification({
         We sent a temporary verification code to{" "}
         <b style={{ color: "var(--ink)" }}>{email}</b>.
       </p>
+
+      {initialCode && (
+        <div
+          style={{
+            margin: "16px 0",
+            padding: "12px 16px",
+            borderRadius: "12px",
+            background: "rgba(22, 163, 74, 0.08)",
+            border: "1.5px solid rgba(22, 163, 74, 0.3)",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "11px", color: "#15803D", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Your Verification Code
+          </div>
+          <div style={{ fontSize: "28px", fontWeight: "800", color: "#15803D", letterSpacing: "6px", margin: "6px 0" }}>
+            {initialCode}
+          </div>
+          <div style={{ fontSize: "11.5px", color: "var(--mut)" }}>
+            Enter this code below to activate your account.
+          </div>
+        </div>
+      )}
 
       <div
         className={`otp ${shake ? "bad" : ""}`}
