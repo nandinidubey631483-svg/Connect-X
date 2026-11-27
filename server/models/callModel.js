@@ -94,6 +94,7 @@ const callSchema = new mongoose.Schema(
       type: String,
       enum: [...TERMINATION_REASONS, null],
       default: null,
+      set: (v) => (v === "null" || v === "" ? null : v),
     },
     metadata: {
       iceRestartCount: { type: Number, default: 0 },

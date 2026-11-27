@@ -95,10 +95,16 @@ export default function ContactsView({
               : u
           )
         );
-        fetchRequests();
+        if (onContactsUpdated) onContactsUpdated();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send request");
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to send request";
+      toast.error(msg);
+      console.error("[ContactsView] Error sending contact request:", err);
     } finally {
       setActionLoadingId(null);
     }
@@ -122,7 +128,13 @@ export default function ContactsView({
         if (onContactsUpdated) onContactsUpdated();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to accept request");
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to accept request";
+      toast.error(msg);
+      console.error("[ContactsView] Error accepting contact request:", err);
     } finally {
       setActionLoadingId(null);
     }
@@ -140,7 +152,13 @@ export default function ContactsView({
         }));
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to reject request");
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to reject request";
+      toast.error(msg);
+      console.error("[ContactsView] Error rejecting contact request:", err);
     } finally {
       setActionLoadingId(null);
     }
@@ -163,7 +181,13 @@ export default function ContactsView({
         );
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to cancel request");
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to cancel request";
+      toast.error(msg);
+      console.error("[ContactsView] Error canceling contact request:", err);
     } finally {
       setActionLoadingId(null);
     }
@@ -302,7 +326,7 @@ export default function ContactsView({
                               disabled={isActionLoading}
                               onClick={() => handleAcceptRequest(u.requestId, u._id)}
                             >
-                              <FiCheck size={14} /> Accept Request
+                              <FiCheck size={14} /> {isActionLoading ? "Accepting..." : "Accept Request"}
                             </AcceptButton>
                           ) : (
                             <ConnectButton
@@ -310,7 +334,7 @@ export default function ContactsView({
                               disabled={isActionLoading}
                               onClick={() => handleSendRequest(u._id)}
                             >
-                              <FiUserPlus size={14} /> Connect
+                              <FiUserPlus size={14} /> {isActionLoading ? "Connecting..." : "Connect"}
                             </ConnectButton>
                           )}
                         </CardActions>

@@ -316,7 +316,7 @@ export function CallProvider({ children, currentSocket }) {
     (socket, reason = "NORMAL") => {
       const activeSock = socket?.current || socket || currentSocket?.current || currentSocket;
       if (activeCallRef.current?.callId && activeSock) {
-        activeSock.emit("call:end", { callId: activeCallRef.current.callId, reason });
+        activeSock.emit("call:end", { callId: activeCallRef.current.callId, reason: reason || "NORMAL" });
       }
       setCallState(CALL_STATES.ENDED);
       setStatusMessage("Call ended");

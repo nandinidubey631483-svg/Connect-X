@@ -93,7 +93,13 @@ export default function ContactDiscoveryModal({ isOpen, onClose, onContactsUpdat
         fetchRequests();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send request");
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to send request";
+      toast.error(msg);
+      console.error("[ContactDiscoveryModal] Error sending request:", err);
     } finally {
       setActionLoadingId(null);
     }

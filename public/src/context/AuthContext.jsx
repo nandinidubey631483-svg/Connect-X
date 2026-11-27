@@ -93,21 +93,27 @@ export function AuthProvider({ children }) {
           }
         }
       } catch (_) {
-        // No active session or refresh expired: clear tokens cleanly
-        clearAuthTokens();
-        if (isMounted) {
-          // If stored user exists in local dev, preserve non-sensitive profile but clear stale tokens
-          const existing = localStorage.getItem(LOCALHOST_KEY);
-          if (existing) {
-            try {
-              const parsed = JSON.parse(existing);
+        // No active session or refresh expired: check if token in localStorage can be restored in local dev
+        const existing = localStorage.getItem(LOCALHOST_KEY);
+        if (existing) {
+          try {
+            const parsed = JSON.parse(existing);
+            if (parsed && parsed.accessToken) {
+              setAccessToken(parsed.accessToken);
+              await fetchCsrfToken();
               setUser(parsed);
-            } catch (_) {
+            } else {
+              clearAuthTokens();
               setUser(null);
+              localStorage.removeItem(LOCALHOST_KEY);
             }
-          } else {
+          } catch (_) {
+            clearAuthTokens();
             setUser(null);
           }
+        } else {
+          clearAuthTokens();
+          setUser(null);
         }
       } finally {
         if (isMounted) {

@@ -211,13 +211,16 @@ export default function SetAvatar() {
 const Container = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  align-items: flex-start;
+  height: 100vh;
   width: 100vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   background-color: var(--bg, #F3F1EC);
   background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
   background-size: 20px 20px;
-  padding: 1.5rem;
+  padding: 2rem 1rem 3.5rem;
 
   .loader {
     max-inline-size: 100%;
@@ -228,14 +231,15 @@ const Card = styled.div`
   background: var(--surf, #FFFFFF);
   border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
   border-radius: 20px;
-  padding: 2.25rem 2.5rem;
+  padding: 2rem 2.25rem 2.25rem;
   max-width: 580px;
   width: 100%;
+  margin: auto;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 `;
 
 const BrandHeader = styled.div`

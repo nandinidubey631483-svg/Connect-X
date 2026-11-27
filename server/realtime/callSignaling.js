@@ -411,10 +411,23 @@ function registerCallSignaling(io, socket, options = {}) {
       const startRef = call.connectedAt || call.answeredAt || call.startedAt;
       const durationSec = Math.max(0, Math.round((now.getTime() - startRef.getTime()) / 1000));
 
+      const validReasons = [
+        "NORMAL",
+        "CALLER_CANCELLED",
+        "RECEIVER_REJECTED",
+        "RECEIVER_BUSY",
+        "NO_ANSWER_TIMEOUT",
+        "MEDIA_FAILURE",
+        "NETWORK_DISCONNECTED",
+        "PEER_CONNECTION_FAILED",
+        "UNKNOWN",
+      ];
+      const cleanReason = validReasons.includes(reason) ? reason : "NORMAL";
+
       call.status = "ENDED";
       call.endedAt = now;
       call.duration = durationSec;
-      call.terminationReason = reason;
+      call.terminationReason = cleanReason;
       await call.save();
 
       activeCallsMap.delete(String(call.caller));
@@ -428,7 +441,7 @@ function registerCallSignaling(io, socket, options = {}) {
       emitToUser(otherUserId, "call:ended", {
         callId: callIdStr,
         duration: durationSec,
-        reason,
+        reason: cleanReason,
       });
     } catch (err) {
       console.error("[call:end error]", err);

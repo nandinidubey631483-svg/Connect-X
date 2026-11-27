@@ -13,6 +13,8 @@ import apiClient from "../../services/apiClient";
 import { v1UnreadNotificationsCountRoute } from "../../services/apiRoutes";
 import LogoImg from "../../assets/connectx-logo.png";
 import DoodleBg from "../../assets/doodle_pattern.svg";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   FiMessageSquare,
   FiUserPlus,
@@ -649,6 +651,9 @@ export default function MainLayout({
           </button>
         </nav>
       )}
+
+      {/* Global Toast Container for App-wide Notifications */}
+      <ToastContainer position="bottom-right" autoClose={4000} theme="light" />
     </div>
   );
 }
