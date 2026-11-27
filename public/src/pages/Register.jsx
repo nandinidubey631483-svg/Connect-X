@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,6 +25,7 @@ export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(true);
+  const [usernameStatus, setUsernameStatus] = useState(null); // { checking: bool, available: bool, message: string }
 
   const toastOptions = {
     position: "bottom-right",
@@ -40,6 +41,62 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
+
+  // Debounced check for username format and live availability
+  useEffect(() => {
+    const raw = (values.username || "").trim();
+    if (!raw) {
+      setUsernameStatus(null);
+      return;
+    }
+
+    if (raw.length < 3) {
+      setUsernameStatus({
+        checking: false,
+        available: null,
+        message: "Use numbers, underscores (_), or dots (.)",
+      });
+      return;
+    }
+
+    if (!USERNAME_REGEX.test(raw)) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: "Use numbers, underscores (_), or dots (.)",
+      });
+      return;
+    }
+
+    let isCancelled = false;
+    setUsernameStatus({ checking: true, available: null, message: "Checking..." });
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiClient.get(`${v1AuthRoute}/check-username?username=${encodeURIComponent(raw)}`);
+        if (!isCancelled && res.data) {
+          if (res.data.available) {
+            setUsernameStatus({ checking: false, available: true, message: "Available" });
+          } else {
+            setUsernameStatus({
+              checking: false,
+              available: false,
+              message: res.data.message === "Not available" ? "Not available" : (res.data.message || "Not available"),
+            });
+          }
+        }
+      } catch (_) {
+        if (!isCancelled) {
+          setUsernameStatus({ checking: false, available: null, message: null });
+        }
+      }
+    }, 320);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [values.username]);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -184,10 +241,7 @@ export default function Register() {
 
                 <form onSubmit={handleSubmit} data-testid="register-form">
                   <div className="fld">
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                      <label style={{ margin: 0 }}>Username</label>
-                      <span className="sm mut" style={{ fontSize: "11px" }}>Instagram style (e.g. muskan_12, dev.01)</span>
-                    </div>
+                    <label>Username</label>
                     <input
                       type="text"
                       className="in"
@@ -199,20 +253,19 @@ export default function Register() {
                       autoComplete="username"
                       data-testid="register-username"
                     />
-                    {values.username && (
-                      <div style={{ marginTop: "4px", fontSize: "11px" }}>
-                        {USERNAME_REGEX.test(values.username) ? (
-                          <span style={{ color: "#10B981", fontWeight: "600" }}>✓ Valid username format</span>
-                        ) : (
-                          <span style={{ color: "#EF4444", fontWeight: "600" }}>
-                            {values.username.length < 3
-                              ? "Min 3 characters"
-                              : values.username.startsWith(".") || values.username.endsWith(".")
-                              ? "Cannot start or end with a dot (.)"
-                              : values.username.includes("..")
-                              ? "No consecutive dots (..)"
-                              : "Allowed: letters, numbers, underscores (_), and dots (.)"}
+                    {usernameStatus && (
+                      <div style={{ marginTop: "5px", fontSize: "11.5px" }}>
+                        {usernameStatus.checking ? (
+                          <span style={{ color: "var(--mut)", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                            <span className="spin" style={{ width: "11px", height: "11px", borderWidth: "2px" }}></span>
+                            Checking availability...
                           </span>
+                        ) : usernameStatus.available === true ? (
+                          <span style={{ color: "#16A34A", fontWeight: "600" }}>✓ Available</span>
+                        ) : usernameStatus.available === false ? (
+                          <span style={{ color: "#DC2626", fontWeight: "600" }}>✕ {usernameStatus.message}</span>
+                        ) : (
+                          <span style={{ color: "var(--mut)" }}>💡 {usernameStatus.message}</span>
                         )}
                       </div>
                     )}

@@ -29,6 +29,7 @@ const { authenticateToken, requireAuth } = require("../middleware/authMiddleware
 router.post("/register", validateOrigin, authRegisterRateLimiter, authController.register);
 router.post("/login", validateOrigin, authLoginRateLimiter, authController.login);
 router.get("/csrf-token", csrfTokenRateLimiter, authController.getCsrfToken);
+router.get("/check-username", validateOrigin, authController.checkUsername);
 
 // CAPTCHA endpoints
 router.post("/captcha/generate", validateOrigin, captchaController.generateCaptcha);

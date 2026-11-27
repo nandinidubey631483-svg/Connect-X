@@ -673,6 +673,40 @@ async function getMe(req, res, next) {
   }
 }
 
+/**
+ * Check Username Availability endpoint
+ */
+async function checkUsername(req, res, next) {
+  try {
+    const rawUsername = (req.query.username || "").trim();
+    if (!rawUsername) {
+      return res.status(200).json({ success: true, available: false, message: "Username is required." });
+    }
+
+    const usernameVal = validateUsername(rawUsername);
+    if (!usernameVal.isValid) {
+      return res.status(200).json({
+        success: true,
+        available: false,
+        message: usernameVal.error || "Use numbers, underscores (_), or dots (.)",
+      });
+    }
+
+    const clean = usernameVal.sanitized;
+    const existing = await User.findOne({
+      username: { $regex: new RegExp("^" + clean.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i") },
+    }).select("_id");
+
+    if (existing) {
+      return res.status(200).json({ success: true, available: false, message: "Not available" });
+    }
+
+    return res.status(200).json({ success: true, available: true, message: "Available" });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -681,4 +715,5 @@ module.exports = {
   logoutAll,
   getCsrfToken,
   getMe,
+  checkUsername,
 };
