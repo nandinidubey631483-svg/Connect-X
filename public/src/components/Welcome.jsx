@@ -73,16 +73,27 @@ const BannerCard = styled.div`
   align-items: center;
   gap: 1.25rem;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
-  animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), welcomeFloat 7s ease-in-out infinite alternate;
 
   @keyframes popIn {
     from {
       opacity: 0;
-      transform: scale(0.94) translateY(12px);
+      transform: scale(0.92) translateY(16px);
     }
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes welcomeFloat {
+    0% {
+      transform: translateY(0);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(217, 139, 112, 0.08);
+    }
+    100% {
+      transform: translateY(-8px);
+      box-shadow: 0 26px 54px rgba(0, 0, 0, 0.12), 0 0 20px 2px rgba(217, 139, 112, 0.16);
     }
   }
 
@@ -102,15 +113,33 @@ const LogoCircle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  animation: logoPulse 5s ease-in-out infinite alternate;
+
+  @keyframes logoPulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 8px 24px rgba(217, 139, 112, 0.15);
+    }
+    100% {
+      transform: scale(1.04);
+      box-shadow: 0 12px 32px rgba(217, 139, 112, 0.28);
+    }
+  }
 
   img {
     width: 44px;
     height: auto;
+    transition: transform 0.3s ease;
   }
 
   &:hover {
-    transform: scale(1.08) rotate(-4deg);
+    transform: scale(1.12) rotate(-5deg);
+    box-shadow: 0 16px 36px rgba(217, 139, 112, 0.35);
+
+    img {
+      transform: scale(1.05);
+    }
   }
 `;
 
