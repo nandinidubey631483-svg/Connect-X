@@ -507,7 +507,7 @@ export default function MainLayout({
         <div
           style={{
             margin: isMobile ? 0 : "12px 12px 12px 12px",
-            height: isMobile ? "100vh" : "calc(100vh - 24px)",
+            height: isMobile ? "calc(100dvh - 56px - env(safe-area-inset-bottom, 0px))" : "calc(100vh - 24px)",
             borderRadius: isMobile ? 0 : "20px",
             background: "var(--surf, #FFFFFF)",
             border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.08)",
@@ -576,13 +576,15 @@ export default function MainLayout({
             bottom: 0,
             left: 0,
             right: 0,
-            height: "56px",
+            height: "calc(56px + env(safe-area-inset-bottom, 0px))",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
             background: "var(--surf)",
             borderTop: "1px solid var(--line)",
             display: "flex",
             justifyContent: "space-around",
             alignItems: "center",
             zIndex: 20,
+            boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.05)",
           }}
         >
           <button
@@ -590,6 +592,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "chats" ? "on" : ""}`}
             onClick={() => handleTabChange("chats")}
             title="Chats"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <FiMessageSquare size={20} />
           </button>
@@ -598,6 +601,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "people" ? "on" : ""}`}
             onClick={() => handleTabChange("people")}
             title="People"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <FiUserPlus size={20} />
           </button>
@@ -606,6 +610,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "calls" ? "on" : ""}`}
             onClick={() => handleTabChange("calls")}
             title="Calls"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <FiPhone size={20} />
           </button>
@@ -614,6 +619,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "notifications" ? "on" : ""}`}
             onClick={() => handleTabChange("notifications")}
             title="Notifications"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <FiBell size={20} />
           </button>
@@ -622,6 +628,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "settings" ? "on" : ""}`}
             onClick={() => handleTabChange("settings")}
             title="Settings"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <FiSettings size={20} />
           </button>
@@ -630,6 +637,7 @@ export default function MainLayout({
             className={`nb ${activeRailTab === "profile" ? "on" : ""}`}
             onClick={() => handleTabChange("profile")}
             title="Profile"
+            style={{ minWidth: "44px", minHeight: "44px", display: "grid", placeItems: "center" }}
           >
             <div
               style={{

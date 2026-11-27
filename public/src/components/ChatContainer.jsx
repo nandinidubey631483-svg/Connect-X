@@ -575,7 +575,89 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
             gap: "6px",
           }}
         >
-          {messages.map((message, idx) => {
+          {messages.length === 0 ? (
+            <div
+              style={{
+                margin: "auto",
+                textAlign: "center",
+                padding: "40px 20px",
+                maxWidth: "380px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "18px",
+                  background: "var(--acc2, #FBF3EF)",
+                  color: "var(--acc, #D98B70)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: "26px",
+                }}
+              >
+                👋
+              </div>
+              <h3
+                style={{
+                  fontFamily: "var(--font-serif, 'Playfair Display', serif)",
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "var(--ink, #252321)",
+                  margin: 0,
+                }}
+              >
+                Say hello to {currentChat?.displayName || currentChat?.username}!
+              </h3>
+              <p
+                style={{
+                  fontSize: "12.5px",
+                  color: "var(--mut, #7A756F)",
+                  margin: 0,
+                  lineHeight: "1.5",
+                }}
+              >
+                This is the start of your direct conversation history. Send a message or file to connect.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  marginTop: "8px",
+                }}
+              >
+                {["👋 Hi there!", "How are you doing?", "Nice to connect with you!"].map((promptText) => (
+                  <button
+                    key={promptText}
+                    type="button"
+                    onClick={() => handleSendMsg(promptText)}
+                    style={{
+                      background: "var(--surf, #FFFFFF)",
+                      border: "1px solid var(--line, rgba(0,0,0,0.1))",
+                      borderRadius: "16px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      color: "var(--ink, #252321)",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--acc, #D98B70)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--line, rgba(0,0,0,0.1))")}
+                  >
+                    {promptText}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            messages.map((message, idx) => {
             const isMe = !!message.fromSelf;
             const timeStr = message.createdAt
               ? new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -627,7 +709,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                 </div>
               </div>
             );
-          })}
+          })
+        )}
         </div>
 
         {/* Chat Composer */}

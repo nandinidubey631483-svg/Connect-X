@@ -126,7 +126,14 @@ export default function Sidebar({
       </div>
 
       {/* Contacts List */}
-      <div className="sec" style={{ flex: 1, overflowY: "auto", padding: "10px 10px" }}>
+      <div
+        className="sec"
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "10px 10px calc(64px + env(safe-area-inset-bottom, 0px))",
+        }}
+      >
         <div
           className="sh2"
           style={{
@@ -142,9 +149,82 @@ export default function Sidebar({
         </div>
 
         {filteredContacts.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 16px", color: "var(--mut)" }}>
-            <FiMessageSquare size={32} style={{ opacity: 0.4, marginBottom: "8px" }} />
-            <p style={{ fontSize: "13px" }}>No other users registered yet.</p>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "36px 16px",
+              color: "var(--mut)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                background: "var(--s2, rgba(0,0,0,0.03))",
+                display: "grid",
+                placeItems: "center",
+                color: "var(--acc, #D98B70)",
+              }}
+            >
+              <FiMessageSquare size={22} />
+            </div>
+            {searchQuery ? (
+              <>
+                <p style={{ fontSize: "13.5px", fontWeight: "600", color: "var(--ink)", margin: 0 }}>
+                  No chats match &ldquo;{searchQuery}&rdquo;
+                </p>
+                <p style={{ fontSize: "12px", margin: 0 }}>Check the spelling or try another keyword</p>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  style={{
+                    marginTop: "6px",
+                    background: "none",
+                    border: "1px solid var(--line)",
+                    borderRadius: "8px",
+                    padding: "5px 12px",
+                    fontSize: "12px",
+                    color: "var(--acc)",
+                    cursor: "pointer",
+                  }}
+                >
+                  Clear search
+                </button>
+              </>
+            ) : activeTab === "unread" ? (
+              <p style={{ fontSize: "13px", margin: 0 }}>All caught up! No unread messages.</p>
+            ) : activeTab === "online" ? (
+              <p style={{ fontSize: "13px", margin: 0 }}>No contacts currently online.</p>
+            ) : (
+              <>
+                <p style={{ fontSize: "13px", margin: 0 }}>No other users registered yet.</p>
+                <p style={{ fontSize: "12px", margin: 0 }}>Connect with team members and friends to start chatting.</p>
+                {onOpenDiscovery && (
+                  <button
+                    type="button"
+                    onClick={onOpenDiscovery}
+                    style={{
+                      marginTop: "6px",
+                      background: "var(--acc, #D98B70)",
+                      border: "none",
+                      color: "#FFFFFF",
+                      borderRadius: "8px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Find People
+                  </button>
+                )}
+              </>
+            )}
           </div>
         ) : (
           filteredContacts.map((contact) => {

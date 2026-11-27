@@ -10,12 +10,14 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
 import SessionExpiryBanner from "./components/common/SessionExpiryBanner";
+import NetworkStatusBanner from "./components/common/NetworkStatusBanner";
 
 export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
+          <NetworkStatusBanner />
           <SessionExpiryBanner />
           <BrowserRouter>
             <Routes>
