@@ -3,7 +3,8 @@
  * Rule: Never use fallback JWT or cookie secrets.
  * Validates required configuration and fails safely upon invalid startup states.
  */
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 function validateEnv() {
   const errors = [];
@@ -65,13 +66,19 @@ function validateEnv() {
       !isNaN(Number(process.env.TRUST_PROXY)) ? Number(process.env.TRUST_PROXY) :
       process.env.TRUST_PROXY
     ) : (nodeEnv === "production" ? 1 : false),
+    redisUrl: process.env.REDIS_URL || null,
+    turn: {
+      url: process.env.TURN_URL || null,
+      username: process.env.TURN_USERNAME || null,
+      credential: process.env.TURN_CREDENTIAL || null,
+    },
     smtp: {
       host: process.env.SMTP_HOST || null,
       port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
       secure: process.env.SMTP_SECURE === "true" || process.env.SMTP_PORT === "465",
-      user: process.env.SMTP_USER || null,
-      pass: process.env.SMTP_PASS || null,
-      from: process.env.EMAIL_FROM || "ConnectX Security <no-reply@connectx.local>",
+      user: process.env.SMTP_USER ? process.env.SMTP_USER.trim() : null,
+      pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, "") : null,
+      from: process.env.EMAIL_FROM || (process.env.SMTP_USER ? `"ConnectX Security" <${process.env.SMTP_USER.trim()}>` : "ConnectX Security <no-reply@connectx.local>"),
       isConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
     },
   });

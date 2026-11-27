@@ -213,7 +213,7 @@ export function CallProvider({ children, currentSocket }) {
         resetCallState(3000);
       }
     },
-    [currentSocket, resetCallState]
+    [resetCallState, resolveSocket]
   );
 
   const startVoiceCall = useCallback(

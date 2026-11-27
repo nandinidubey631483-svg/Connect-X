@@ -16,29 +16,29 @@ svg{flex:none}
 
 /* auth background animations */
 .auth-bg-container{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;overflow:hidden}
-.auth-bg-grid{position:absolute;inset:0;background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:28px 28px;opacity:0.55;mask-image:radial-gradient(circle at center,black 40%,transparent 85%);-webkit-mask-image:radial-gradient(circle at center,black 40%,transparent 85%)}
+.auth-bg-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(217,139,112,0.35) 1.5px,transparent 1.5px);background-size:26px 26px;opacity:0.75;mask-image:radial-gradient(circle at center,black 45%,transparent 88%);-webkit-mask-image:radial-gradient(circle at center,black 45%,transparent 88%)}
 .auth-bg-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.auth-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.65;pointer-events:none;transform:translate3d(0,0,0)}
-.auth-orb-1{width:480px;height:480px;top:-120px;right:-100px;background:radial-gradient(circle,rgba(217,139,112,0.26) 0%,rgba(217,139,112,0) 70%);animation:authOrbFloat1 18s ease-in-out infinite alternate}
-.auth-orb-2{width:520px;height:520px;bottom:-140px;left:-120px;background:radial-gradient(circle,rgba(240,180,150,0.22) 0%,rgba(217,139,112,0) 70%);animation:authOrbFloat2 22s ease-in-out infinite alternate}
-.auth-orb-3{width:360px;height:360px;top:40%;left:55%;background:radial-gradient(circle,rgba(217,139,112,0.16) 0%,rgba(245,242,237,0) 70%);animation:authOrbFloat3 15s ease-in-out infinite alternate}
-.auth-orb-4{width:320px;height:320px;top:20%;left:-80px;background:radial-gradient(circle,rgba(217,139,112,0.18) 0%,rgba(240,180,150,0) 70%);animation:authOrbFloat2 26s ease-in-out infinite alternate}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(48px);opacity:0.88;pointer-events:none;transform:translate3d(0,0,0)}
+.auth-orb-1{width:500px;height:500px;top:-100px;right:-80px;background:radial-gradient(circle,rgba(217,139,112,0.65) 0%,rgba(217,139,112,0.28) 48%,rgba(217,139,112,0) 72%);animation:authOrbFloat1 18s ease-in-out infinite alternate}
+.auth-orb-2{width:540px;height:540px;bottom:-120px;left:-100px;background:radial-gradient(circle,rgba(230,122,86,0.62) 0%,rgba(240,160,130,0.3) 48%,rgba(217,139,112,0) 72%);animation:authOrbFloat2 22s ease-in-out infinite alternate}
+.auth-orb-3{width:380px;height:380px;top:38%;left:52%;background:radial-gradient(circle,rgba(245,170,125,0.58) 0%,rgba(217,139,112,0.22) 50%,rgba(245,242,237,0) 72%);animation:authOrbFloat3 15s ease-in-out infinite alternate}
+.auth-orb-4{width:350px;height:350px;top:18%;left:-60px;background:radial-gradient(circle,rgba(220,110,75,0.55) 0%,rgba(240,180,150,0.24) 50%,rgba(240,180,150,0) 72%);animation:authOrbFloat2 26s ease-in-out infinite alternate}
 
 /* orbital rings */
-.auth-ring{position:absolute;border-radius:50%;border:1px dashed rgba(217,139,112,0.22);pointer-events:none}
+.auth-ring{position:absolute;border-radius:50%;border:2px dashed rgba(217,139,112,0.48);box-shadow:0 0 25px rgba(217,139,112,0.25);pointer-events:none}
 .auth-ring-1{width:580px;height:580px;top:50%;left:50%;transform:translate(-50%,-50%);animation:authRingRotate 45s linear infinite}
-.auth-ring-2{width:760px;height:760px;top:50%;left:50%;transform:translate(-50%,-50%);border-style:dotted;border-color:rgba(217,139,112,0.14);animation:authRingRotate 70s linear infinite reverse}
+.auth-ring-2{width:760px;height:760px;top:50%;left:50%;transform:translate(-50%,-50%);border-style:dotted;border-color:rgba(217,139,112,0.38);box-shadow:0 0 35px rgba(217,139,112,0.2);animation:authRingRotate 70s linear infinite reverse}
 
-/* subtle horizontal ambient aurora glow */
-.auth-aurora{position:absolute;width:120vw;height:120px;left:-10vw;filter:blur(60px);opacity:0.22;pointer-events:none}
-.auth-aurora-top{top:0;background:linear-gradient(90deg,transparent,rgba(217,139,112,0.4),rgba(240,180,150,0.3),transparent);animation:auroraDrift 14s ease-in-out infinite alternate}
-.auth-aurora-bottom{bottom:0;background:linear-gradient(90deg,transparent,rgba(240,180,150,0.3),rgba(217,139,112,0.4),transparent);animation:auroraDrift 18s ease-in-out infinite alternate reverse}
+/* visible horizontal ambient aurora glow */
+.auth-aurora{position:absolute;width:120vw;height:140px;left:-10vw;filter:blur(40px);opacity:0.42;pointer-events:none}
+.auth-aurora-top{top:0;background:linear-gradient(90deg,transparent,rgba(217,139,112,0.65),rgba(240,160,130,0.5),transparent);animation:auroraDrift 14s ease-in-out infinite alternate}
+.auth-aurora-bottom{bottom:0;background:linear-gradient(90deg,transparent,rgba(240,160,130,0.5),rgba(217,139,112,0.65),transparent);animation:auroraDrift 18s ease-in-out infinite alternate reverse}
 
-:root[data-theme=dark] .auth-orb-1{background:radial-gradient(circle,rgba(224,152,127,0.22) 0%,rgba(224,152,127,0) 70%)}
-:root[data-theme=dark] .auth-orb-2{background:radial-gradient(circle,rgba(217,139,112,0.18) 0%,rgba(37,35,33,0) 70%)}
-:root[data-theme=dark] .auth-orb-3{background:radial-gradient(circle,rgba(224,152,127,0.14) 0%,rgba(37,35,33,0) 70%)}
-:root[data-theme=dark] .auth-orb-4{background:radial-gradient(circle,rgba(224,152,127,0.15) 0%,rgba(37,35,33,0) 70%)}
-:root[data-theme=dark] .auth-ring{border-color:rgba(224,152,127,0.16)}
+:root[data-theme=dark] .auth-orb-1{background:radial-gradient(circle,rgba(224,152,127,0.55) 0%,rgba(224,152,127,0.22) 50%,transparent 72%)}
+:root[data-theme=dark] .auth-orb-2{background:radial-gradient(circle,rgba(217,139,112,0.48) 0%,rgba(217,139,112,0.18) 50%,transparent 72%)}
+:root[data-theme=dark] .auth-orb-3{background:radial-gradient(circle,rgba(224,152,127,0.42) 0%,rgba(37,35,33,0) 72%)}
+:root[data-theme=dark] .auth-orb-4{background:radial-gradient(circle,rgba(224,152,127,0.45) 0%,rgba(37,35,33,0) 72%)}
+:root[data-theme=dark] .auth-ring{border-color:rgba(224,152,127,0.38);box-shadow:0 0 25px rgba(224,152,127,0.22)}
 
 @keyframes authOrbFloat1{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-60px,80px) scale(1.12)}100%{transform:translate(40px,120px) scale(0.92)}}
 @keyframes authOrbFloat2{0%{transform:translate(0,0) scale(1)}50%{transform:translate(80px,-60px) scale(1.08)}100%{transform:translate(-50px,-90px) scale(0.95)}}

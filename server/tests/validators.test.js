@@ -26,7 +26,7 @@ const {
 describe("ConnectX Validation & Sanitization Engine Tests", () => {
   describe("1. Username Validation", () => {
     test("accepts valid alphanumeric usernames with hyphens and underscores", () => {
-      const validCases = ["alice", "bob_123", "charlie-dev", "user_name_99", "dev-master-1", "_alice", "alice_", "muskan.123", "muskan_dubey"];
+      const validCases = ["alice_01", "bob_123", "charlie-dev", "user_name_99", "dev-master-1", "_alice", "alice_", "muskan.123", "muskan_dubey"];
       for (const u of validCases) {
         const res = validateUsername(u);
         assert.strictEqual(res.isValid, true, `Expected ${u} to be valid`);

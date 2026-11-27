@@ -1,4 +1,7 @@
-export const host = "http://localhost:5000";
+export const host =
+  process.env.REACT_APP_API_URL ||
+  process.env.REACT_APP_SOCKET_URL ||
+  (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
 export const loginRoute = `${host}/api/auth/login`;
 export const registerRoute = `${host}/api/auth/register`;
 export const logoutRoute = `${host}/api/auth/logout`;

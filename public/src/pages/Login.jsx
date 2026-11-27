@@ -120,7 +120,14 @@ export default function Login() {
               <CaptchaShield
                 isVerified={isCaptchaVerified}
                 onVerify={() => setIsCaptchaVerified(true)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !values.username.trim() || !values.password}
+                onDisabledClick={() => {
+                  if (!values.username.trim()) {
+                    toast.warn("Please enter your username first.", toastOptions);
+                  } else if (!values.password) {
+                    toast.warn("Please enter your password first.", toastOptions);
+                  }
+                }}
               />
 
               <button

@@ -31,40 +31,40 @@ export default function AuthBackground() {
     window.addEventListener("resize", resize);
     resize();
 
-    // Floating warm ambient particles
-    const particleCount = Math.min(Math.floor((width * height) / 30000), 45);
+    // Floating warm ambient particles with rich visibility
+    const particleCount = Math.min(Math.floor((width * height) / 24000), 55);
     const particles = [];
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        r: Math.random() * 2.2 + 0.9,
-        vx: (Math.random() - 0.5) * 0.32,
-        vy: -Math.random() * 0.42 - 0.12, // gentle upward drift
-        alpha: Math.random() * 0.45 + 0.15,
-        baseAlpha: Math.random() * 0.45 + 0.15,
-        pulseSpeed: Math.random() * 0.02 + 0.01,
+        r: Math.random() * 2.6 + 1.8, // noticeably larger & crisp
+        vx: (Math.random() - 0.5) * 0.38,
+        vy: -Math.random() * 0.5 - 0.18, // gentle upward drift
+        alpha: Math.random() * 0.35 + 0.55,
+        baseAlpha: Math.random() * 0.35 + 0.55,
+        pulseSpeed: Math.random() * 0.025 + 0.015,
         phase: Math.random() * Math.PI * 2,
       });
     }
 
-    // Occasional shooting stardust embers
+    // Dynamic shooting stardust embers
     const shootingStars = [];
-    let nextSpawnTime = performance.now() + 1800;
+    let nextSpawnTime = performance.now() + 1000;
 
     const spawnShootingStar = (now) => {
-      const angle = (Math.PI / 6) + (Math.random() - 0.5) * 0.3; // diagonal
-      const speed = Math.random() * 4 + 4;
+      const angle = (Math.PI / 6) + (Math.random() - 0.5) * 0.35; // diagonal drift
+      const speed = Math.random() * 5 + 5;
       shootingStars.push({
-        x: Math.random() * width * 0.7,
-        y: Math.random() * height * 0.4,
+        x: Math.random() * width * 0.8,
+        y: Math.random() * height * 0.45,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        len: Math.random() * 45 + 25,
-        alpha: 0.7,
-        decay: Math.random() * 0.015 + 0.012,
+        len: Math.random() * 55 + 35,
+        alpha: 0.95,
+        decay: Math.random() * 0.014 + 0.01,
       });
-      nextSpawnTime = now + Math.random() * 3500 + 2500;
+      nextSpawnTime = now + Math.random() * 2800 + 1600;
     };
 
     let mouse = { x: width * 0.5, y: height * 0.5, active: false };
@@ -96,13 +96,16 @@ export default function AuthBackground() {
       }
 
       // Draw and update shooting stars
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = `rgba(${terracotta}, 0.8)`;
+
       for (let s = shootingStars.length - 1; s >= 0; s--) {
         const star = shootingStars[s];
         star.x += star.vx;
         star.y += star.vy;
         star.alpha -= star.decay;
 
-        if (star.alpha <= 0 || star.x > width + 50 || star.y > height + 50) {
+        if (star.alpha <= 0 || star.x > width + 60 || star.y > height + 60) {
           shootingStars.splice(s, 1);
           continue;
         }
@@ -116,19 +119,22 @@ export default function AuthBackground() {
 
         ctx.beginPath();
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = 2.4;
         ctx.moveTo(star.x, star.y);
         ctx.lineTo(tailX, tailY);
         ctx.stroke();
 
-        // Small head glow
+        // Prominent glowing head
         ctx.beginPath();
-        ctx.arc(star.x, star.y, 1.6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${terracotta}, ${star.alpha * 1.2})`;
+        ctx.arc(star.x, star.y, 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${terracotta}, ${Math.min(1, star.alpha * 1.3)})`;
         ctx.fill();
       }
 
-      // Draw subtle connecting strands between nearby particles
+      // Draw connecting constellation strands
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = `rgba(${terracotta}, 0.5)`;
+
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
@@ -136,27 +142,27 @@ export default function AuthBackground() {
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 115) {
-            const lineAlpha = (1 - dist / 115) * 0.14 * Math.min(p1.alpha, p2.alpha);
+          if (dist < 135) {
+            const lineAlpha = (1 - dist / 135) * 0.55 * Math.min(p1.alpha, p2.alpha);
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${terracotta}, ${lineAlpha})`;
-            ctx.lineWidth = 0.85;
+            ctx.lineWidth = 1.2;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }
 
-        // Draw interactive strand to cursor if nearby
+        // Distinct interactive strand to cursor if nearby
         if (mouse.active) {
           const cdx = p1.x - mouse.x;
           const cdy = p1.y - mouse.y;
           const cdist = Math.sqrt(cdx * cdx + cdy * cdy);
-          if (cdist < 140) {
-            const cursorAlpha = (1 - cdist / 140) * 0.28 * p1.alpha;
+          if (cdist < 160) {
+            const cursorAlpha = (1 - cdist / 160) * 0.7 * p1.alpha;
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${terracotta}, ${cursorAlpha})`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.5;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(mouse.x, mouse.y);
             ctx.stroke();
@@ -164,21 +170,21 @@ export default function AuthBackground() {
         }
       }
 
-      // Draw and update particles
+      // Draw and update glowing particles
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
         // Pulse alpha
-        p.alpha = p.baseAlpha + Math.sin(elapsed * 2.2 + p.phase) * 0.16;
-        p.alpha = Math.max(0.06, Math.min(0.7, p.alpha));
+        p.alpha = p.baseAlpha + Math.sin(elapsed * 2.4 + p.phase) * 0.2;
+        p.alpha = Math.max(0.25, Math.min(0.95, p.alpha));
 
         // Subtle mouse repulsion
         if (mouse.active) {
           const mdx = p.x - mouse.x;
           const mdy = p.y - mouse.y;
           const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-          if (mdist < 150 && mdist > 0) {
-            const force = (1 - mdist / 150) * 0.55;
+          if (mdist < 160 && mdist > 0) {
+            const force = (1 - mdist / 160) * 0.6;
             p.x += (mdx / mdist) * force;
             p.y += (mdy / mdist) * force;
           }
@@ -189,18 +195,21 @@ export default function AuthBackground() {
         p.y += p.vy;
 
         // Wrap around
-        if (p.x < -10) p.x = width + 10;
-        if (p.x > width + 10) p.x = -10;
-        if (p.y < -10) p.y = height + 10;
-        if (p.y > height + 10) p.y = -10;
+        if (p.x < -15) p.x = width + 15;
+        if (p.x > width + 15) p.x = -15;
+        if (p.y < -15) p.y = height + 15;
+        if (p.y > height + 15) p.y = -15;
 
-        // Draw particle
+        // Draw particle with luminous glow
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(${terracotta}, 0.75)`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${terracotta}, ${p.alpha})`;
         ctx.fill();
       }
 
+      ctx.shadowBlur = 0; // reset shadow for performance
       animId = requestAnimationFrame(loop);
     };
 
@@ -226,7 +235,7 @@ export default function AuthBackground() {
       <div className="auth-ring auth-ring-1" />
       <div className="auth-ring auth-ring-2" />
 
-      {/* Gentle horizontal ambient aurora glow */}
+      {/* Visible horizontal ambient aurora glow */}
       <div className="auth-aurora auth-aurora-top" />
       <div className="auth-aurora auth-aurora-bottom" />
 

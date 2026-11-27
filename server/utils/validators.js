@@ -80,10 +80,10 @@ function validateUsername(username) {
     };
   }
 
-  if (!USERNAME_REGEX.test(trimmed)) {
+  if (!/^[a-zA-Z0-9._-]+$/.test(trimmed) || /^[.-]|[.-]$|\.\./.test(trimmed)) {
     return {
       isValid: false,
-      error: "Username must contain only letters, numbers, underscores, dots, or hyphens (like an Instagram handle), and cannot start or end with a dot or hyphen.",
+      error: "Username can only contain letters, numbers, underscores (_), and dots (.).",
       sanitized: trimmed,
     };
   }
@@ -92,6 +92,14 @@ function validateUsername(username) {
     return {
       isValid: false,
       error: "This username is reserved and cannot be registered.",
+      sanitized: trimmed,
+    };
+  }
+
+  if (!/[0-9_.-]/.test(trimmed)) {
+    return {
+      isValid: false,
+      error: "Username must include numbers, underscores (_), or dots (.) (like an Instagram handle).",
       sanitized: trimmed,
     };
   }

@@ -8,8 +8,10 @@ const config = require("./env");
 async function connectDatabase() {
   try {
     const conn = await mongoose.connect(config.mongoUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      maxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE) || 50,
+      minPoolSize: Number(process.env.MONGO_MIN_POOL_SIZE) || 5,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);

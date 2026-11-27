@@ -36,6 +36,13 @@ export const EMAIL_REGEX =
 // Instagram-style username format: 3-30 chars, alphanumeric, underscores, dots, hyphens (cannot start/end with dot or hyphen, no consecutive dots)
 export const USERNAME_REGEX = /^(?!.*\.\.)(?!^[.-])(?!.*[.-]$)[a-zA-Z0-9._-]{3,30}$/;
 
+/**
+ * Checks if username complies with Instagram style (numbers, underscores, or dots)
+ */
+export const hasInstagramFormat = (username) => {
+  return typeof username === "string" && /[0-9_.-]/.test(username);
+};
+
 export const PHONE_REGEX = /^\+?[0-9\s\-().]{7,20}$/;
 
 export const FORBIDDEN_EXTENSIONS = new Set([

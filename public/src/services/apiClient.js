@@ -19,7 +19,9 @@ import {
 } from "./tokenManager";
 import { v1RefreshRoute, v1CsrfRoute } from "./apiRoutes";
 
-const baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const baseURL =
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
 
 const apiClient = axios.create({
   baseURL,
@@ -82,8 +84,20 @@ export async function fetchCsrfToken() {
 // Request Interceptor: Injects Bearer token and CSRF header
 apiClient.interceptors.request.use(
   (config) => {
-    // 1. Inject in-memory access token
-    const token = getAccessToken();
+    // 1. Inject in-memory access token (hydrating from localStorage if needed)
+    let token = getAccessToken();
+    if (!token && typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY || "chat-app-current-user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.accessToken) {
+            token = parsed.accessToken;
+            setAccessToken(token);
+          }
+        }
+      } catch (_) {}
+    }
     if (token) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;

@@ -2,7 +2,10 @@
  * ConnectX Centralized API Route Dictionary
  * Preserves legacy routes while adding v1 endpoints and health check paths.
  */
-export const host = process.env.REACT_APP_SOCKET_URL || process.env.REACT_APP_API_URL || "http://localhost:5000";
+export const host =
+  process.env.REACT_APP_SOCKET_URL ||
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== "undefined" && window.location?.origin ? window.location.origin : "http://localhost:5000");
 
 // System Routes
 export const healthRoute = `${host}/health`;

@@ -64,7 +64,10 @@ export default function SettingsView({ onBack }) {
           }));
         }
       } catch (err) {
-        toast.error("Failed to load settings");
+        // Silently preserve defaults on unauthorized or session refresh
+        if (err.response?.status !== 401 && err.message !== "Session expired. Please log in again.") {
+          toast.error("Failed to load settings");
+        }
       } finally {
         setIsLoading(false);
       }

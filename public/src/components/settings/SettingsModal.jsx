@@ -52,7 +52,9 @@ export default function SettingsModal({ isOpen, onClose }) {
           }));
         }
       } catch (err) {
-        toast.error("Failed to load settings");
+        if (err.response?.status !== 401 && err.message !== "Session expired. Please log in again.") {
+          toast.error("Failed to load settings");
+        }
       } finally {
         setIsLoading(false);
       }

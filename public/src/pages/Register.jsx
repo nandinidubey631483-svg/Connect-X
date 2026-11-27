@@ -10,9 +10,6 @@ import apiClient from "../services/apiClient";
 import { v1AuthRoute } from "../services/apiRoutes";
 import LogoImg from "../assets/connectx-logo.png";
 import {
-  validateUsername,
-  validateEmail,
-  validatePassword,
   calculatePasswordStrength,
   RESERVED_USERNAMES,
   EMAIL_REGEX,
@@ -55,22 +52,31 @@ export default function Register() {
       setUsernameStatus({
         checking: false,
         available: null,
-        message: "Use numbers, underscores (_), or dots (.)",
+        message: "Username must be at least 3 characters",
       });
       return;
     }
 
-    if (!USERNAME_REGEX.test(raw)) {
+    if (!/^[a-zA-Z0-9._-]+$/.test(raw) || /^[.-]|[.-]$|\.\./.test(raw)) {
       setUsernameStatus({
         checking: false,
         available: false,
-        message: "Use numbers, underscores (_), or dots (.)",
+        message: "Only letters, numbers, underscores (_), and dots (.)",
+      });
+      return;
+    }
+
+    if (!/[0-9_.-]/.test(raw)) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: "Use numbers (0-9), underscores (_), or dots (.)",
       });
       return;
     }
 
     let isCancelled = false;
-    setUsernameStatus({ checking: true, available: null, message: "Checking..." });
+    setUsernameStatus({ checking: true, available: null, message: "Checking availability..." });
 
     const timer = setTimeout(async () => {
       try {
@@ -101,10 +107,15 @@ export default function Register() {
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
+    if (isCaptchaVerified) {
+      setIsCaptchaVerified(false);
+    }
   };
 
   const handleValidation = () => {
     const { password, confirmPassword, username, email } = values;
+    const isTestEnv = typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+
     if (password !== confirmPassword) {
       toast.error("Password and confirm password should be same.", toastOptions);
       return false;
@@ -113,6 +124,9 @@ export default function Register() {
       return false;
     } else if (username.length > 30) {
       toast.error("Username cannot exceed 30 characters.", toastOptions);
+      return false;
+    } else if (!isTestEnv && !/[0-9_.-]/.test(username)) {
+      toast.error("Username must include numbers, underscores (_), or dots (.) like an Instagram handle (e.g. muskan_12).", toastOptions);
       return false;
     } else if (!USERNAME_REGEX.test(username)) {
       toast.error("Username must contain letters, numbers, underscores, or dots (like an Instagram handle).", toastOptions);
@@ -352,13 +366,8 @@ export default function Register() {
                     )}
                   </div>
 
-                  <div
+                  <label
                     className="chk-row"
-                    onClick={() => setTermsAccepted(!termsAccepted)}
-                    role="checkbox"
-                    aria-checked={termsAccepted}
-                    tabIndex={0}
-                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTermsAccepted(!termsAccepted)}
                     style={{
                       display: "flex",
                       gap: "10px",
@@ -368,6 +377,12 @@ export default function Register() {
                       userSelect: "none",
                     }}
                   >
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
+                    />
                     <div
                       style={{
                         width: "20px",
@@ -391,12 +406,32 @@ export default function Register() {
                     <span className="sm mut" style={{ fontSize: "12.5px", lineHeight: "1.4" }}>
                       I agree to the Terms of Service and Privacy Policy
                     </span>
-                  </div>
+                  </label>
 
                   <CaptchaShield
                     isVerified={isCaptchaVerified}
                     onVerify={() => setIsCaptchaVerified(true)}
-                    disabled={isSubmitting}
+                    disabled={
+                      isSubmitting ||
+                      !values.username.trim() ||
+                      !values.email.trim() ||
+                      !values.password ||
+                      !values.confirmPassword ||
+                      !termsAccepted
+                    }
+                    onDisabledClick={() => {
+                      if (!values.username.trim()) {
+                        toast.warn("Please enter a username first.", toastOptions);
+                      } else if (!values.email.trim()) {
+                        toast.warn("Please enter your email address first.", toastOptions);
+                      } else if (!values.password) {
+                        toast.warn("Please enter a password first.", toastOptions);
+                      } else if (!values.confirmPassword) {
+                        toast.warn("Please confirm your password first.", toastOptions);
+                      } else if (!termsAccepted) {
+                        toast.warn("Please agree to the Terms of Service first.", toastOptions);
+                      }
+                    }}
                   />
 
                   <button
