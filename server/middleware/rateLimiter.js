@@ -212,6 +212,24 @@ const csrfTokenRateLimiter = createRateLimiter({
   message: "Too many CSRF token requests. Please try again later.",
 });
 
+// 5. OTP Send: 5 requests per 10 minutes by Client IP
+const otpSendRateLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  keyPrefix: "auth:otp_send",
+  keyGenerator: (req) => `auth:otp_send:${getClientIp(req)}`,
+  message: "Too many OTP requests from this address. Please try again after 10 minutes.",
+});
+
+// 6. OTP Verify: 10 requests per 10 minutes by Client IP
+const otpVerifyRateLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  keyPrefix: "auth:otp_verify",
+  keyGenerator: (req) => `auth:otp_verify:${getClientIp(req)}`,
+  message: "Too many OTP verification attempts from this address. Please try again after 10 minutes.",
+});
+
 module.exports = {
   createRateLimiter,
   createMemoryStore,
@@ -221,4 +239,6 @@ module.exports = {
   authRegisterRateLimiter,
   authRefreshRateLimiter,
   csrfTokenRateLimiter,
+  otpSendRateLimiter,
+  otpVerifyRateLimiter,
 };

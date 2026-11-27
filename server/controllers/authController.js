@@ -57,14 +57,15 @@ async function register(req, res, next) {
     }
 
     // Verify OTP token if provided
+    let verifiedOtpDoc = null;
     if (otpVerificationToken) {
-      const validOtp = await Otp.findOne({
+      verifiedOtpDoc = await Otp.findOne({
         email: email.toLowerCase().trim(),
         verificationToken: otpVerificationToken,
         consumed: true,
       });
 
-      if (!validOtp) {
+      if (!verifiedOtpDoc) {
         return next(new AppError("Invalid or unverified email verification token.", 400, "INVALID_OTP_TOKEN"));
       }
     }
@@ -86,6 +87,11 @@ async function register(req, res, next) {
       email,
       password: hashedPassword,
     });
+
+    // Invalidate consumed OTP so the verification token cannot be replayed or reused
+    if (verifiedOtpDoc) {
+      await Otp.deleteOne({ _id: verifiedOtpDoc._id });
+    }
 
     // Create primary SessionFamily
     const familyId = `fam_${crypto.randomBytes(16).toString("hex")}`;

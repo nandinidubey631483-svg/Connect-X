@@ -20,6 +20,8 @@ const {
   authLoginRateLimiter,
   authRefreshRateLimiter,
   csrfTokenRateLimiter,
+  otpSendRateLimiter,
+  otpVerifyRateLimiter,
 } = require("../middleware/rateLimiter");
 const { authenticateToken, requireAuth } = require("../middleware/authMiddleware");
 
@@ -33,8 +35,8 @@ router.post("/captcha/generate", validateOrigin, captchaController.generateCaptc
 router.post("/captcha/verify", validateOrigin, captchaController.verifyCaptcha);
 
 // OTP endpoints
-router.post("/otp/send", validateOrigin, otpController.sendOtp);
-router.post("/otp/verify", validateOrigin, otpController.verifyOtp);
+router.post("/otp/send", validateOrigin, otpSendRateLimiter, otpController.sendOtp);
+router.post("/otp/verify", validateOrigin, otpVerifyRateLimiter, otpController.verifyOtp);
 
 // Session endpoints protected by CSRF verification
 router.post("/refresh", validateOrigin, csrfProtection, authRefreshRateLimiter, authController.refresh);
