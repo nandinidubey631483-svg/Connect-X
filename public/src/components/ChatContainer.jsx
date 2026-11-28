@@ -55,8 +55,9 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
               await apiClient.put(
                 v1ConversationReadMessagesRoute(currentChat.conversationId)
               );
-              if (socket && socket.current) {
-                socket.current.emit("message:read", {
+              const activeSocket = socket?.current || socket;
+              if (activeSocket && typeof activeSocket.emit === "function") {
+                activeSocket.emit("message:read", {
                   conversationId: currentChat.conversationId,
                 });
               }
@@ -105,8 +106,9 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
     const targetUserId = String(currentChat._id || currentChat.id || "");
     const myUserId = String(data._id || data.id || "");
 
-    if (socket && socket.current) {
-      socket.current.emit("message:send", {
+    const activeSocket = socket?.current || socket;
+    if (activeSocket && typeof activeSocket.emit === "function") {
+      activeSocket.emit("message:send", {
         conversationId: currentChat.conversationId,
         to: targetUserId,
         from: myUserId,
@@ -116,7 +118,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
       });
 
       if (textContent) {
-        socket.current.emit("send-msg", {
+        activeSocket.emit("send-msg", {
           to: targetUserId,
           from: myUserId,
           msg: textContent,
@@ -145,13 +147,20 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
 
   // Socket event listeners
   useEffect(() => {
-    const activeSocket = socket?.current;
-    if (!activeSocket) return;
+    const activeSocket = socket?.current || socket;
+    if (!activeSocket || typeof activeSocket.on !== "function") return;
 
     const handleReceiveV1 = (payload) => {
       const sender = String(payload?.sender || payload?.from || "");
       const chatTarget = String(currentChat?._id || currentChat?.id || "");
-      if (payload && (!sender || sender === chatTarget)) {
+      const currentConvId = String(currentChat?.conversationId || "");
+      const incomingConvId = String(payload?.conversationId || "");
+
+      const isCurrentConversation =
+        (currentConvId && incomingConvId && currentConvId === incomingConvId) ||
+        (!sender || sender === chatTarget);
+
+      if (payload && isCurrentConversation) {
         const newMsgId = payload._id || uuidv4();
         setArrivalMessage({
           _id: newMsgId,
@@ -179,13 +188,17 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
 
     const handleReceiveLegacy = (msg) => {
       const textMsg = typeof msg === "object" ? (msg.msg || msg.message || msg.text) : msg;
-      setArrivalMessage({
-        _id: uuidv4(),
-        fromSelf: false,
-        message: textMsg,
-        messageType: "TEXT",
-        createdAt: new Date().toISOString(),
-      });
+      const sender = typeof msg === "object" ? String(msg.from || msg.sender || "") : "";
+      const chatTarget = String(currentChat?._id || currentChat?.id || "");
+      if (!sender || sender === chatTarget) {
+        setArrivalMessage({
+          _id: uuidv4(),
+          fromSelf: false,
+          message: textMsg,
+          messageType: "TEXT",
+          createdAt: new Date().toISOString(),
+        });
+      }
     };
 
     const STATUS_WEIGHT = {
@@ -523,7 +536,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
               className="btn ic"
               title="Voice call"
               data-testid="header-voice-call-btn"
-              onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket)}
+              onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
               style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
             >
               <FiPhone size={16} />
@@ -533,7 +546,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
               className="btn ic"
               title="Video call"
               data-testid="header-video-call-btn"
-              onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket)}
+              onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
               style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
             >
               <FiVideo size={16} />
@@ -853,7 +866,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                   className="btn"
                   title="Voice call"
                   data-testid="drawer-voice-call-btn"
-                  onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket)}
+                  onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
                   style={{
                     flex: 1,
                     height: "36px",
@@ -877,7 +890,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
                   className="btn"
                   title="Video call"
                   data-testid="drawer-video-call-btn"
-                  onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket)}
+                  onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
                   style={{
                     flex: 1,
                     height: "36px",

@@ -57,16 +57,19 @@ export function AuthProvider({ children }) {
         // 1. Fetch CSRF token for future mutating requests
         await fetchCsrfToken();
 
-        // 2. Attempt silent refresh via partitioned HttpOnly refresh cookie
-        const currentCsrf = getCsrfToken();
-        const headers = { "Content-Type": "application/json" };
-        if (currentCsrf) {
-          headers["X-CSRF-Token"] = currentCsrf;
+        // 2. Attempt silent refresh via partitioned HttpOnly refresh cookie or stored refreshToken
+        let savedRefreshToken = null;
+        const stored = localStorage.getItem(LOCALHOST_KEY);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            savedRefreshToken = parsed?.refreshToken || null;
+          } catch (_) {}
         }
 
         const refreshRes = await axios.post(
           v1RefreshRoute,
-          {},
+          savedRefreshToken ? { refreshToken: savedRefreshToken } : {},
           {
             withCredentials: true,
             headers,
@@ -74,6 +77,7 @@ export function AuthProvider({ children }) {
         );
 
         if (refreshRes.data && refreshRes.data.accessToken) {
+          const newRefreshToken = refreshRes.data.refreshToken || savedRefreshToken;
           setAccessToken(refreshRes.data.accessToken);
           if (refreshRes.data.csrfToken) {
             setCsrfToken(refreshRes.data.csrfToken);
@@ -87,25 +91,25 @@ export function AuthProvider({ children }) {
               _id: meRes.data.user._id || meRes.data.user.id,
               id: meRes.data.user.id || meRes.data.user._id,
               accessToken: refreshRes.data.accessToken,
+              refreshToken: newRefreshToken,
             };
             setUser(normalized);
             localStorage.setItem(LOCALHOST_KEY, JSON.stringify(normalized));
           }
         }
       } catch (_) {
-        // No active session or refresh expired: check if token in localStorage can be restored in local dev
+        // Fallback: restore saved session from localStorage so refresh never logs user out
         const existing = localStorage.getItem(LOCALHOST_KEY);
         if (existing) {
           try {
             const parsed = JSON.parse(existing);
-            if (parsed && parsed.accessToken) {
-              setAccessToken(parsed.accessToken);
+            if (parsed && (parsed.accessToken || parsed.refreshToken)) {
+              if (parsed.accessToken) setAccessToken(parsed.accessToken);
               await fetchCsrfToken();
               setUser(parsed);
             } else {
               clearAuthTokens();
               setUser(null);
-              localStorage.removeItem(LOCALHOST_KEY);
             }
           } catch (_) {
             clearAuthTokens();
@@ -134,7 +138,7 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const res = await apiClient.post(v1LoginRoute, { username, password });
-      const { accessToken, csrfToken, user: authUser } = res.data;
+      const { accessToken, refreshToken, csrfToken, user: authUser } = res.data;
 
       if (accessToken) setAccessToken(accessToken);
       if (csrfToken) setCsrfToken(csrfToken);
@@ -144,6 +148,7 @@ export function AuthProvider({ children }) {
         _id: authUser._id || authUser.id,
         id: authUser.id || authUser._id,
         accessToken,
+        refreshToken: refreshToken || null,
       };
 
       setUser(normalized);
@@ -166,7 +171,7 @@ export function AuthProvider({ children }) {
         payload.otpVerificationToken = otpVerificationToken;
       }
       const res = await apiClient.post(v1RegisterRoute, payload);
-      const { accessToken, csrfToken, user: authUser } = res.data;
+      const { accessToken, refreshToken, csrfToken, user: authUser } = res.data;
 
       if (accessToken) setAccessToken(accessToken);
       if (csrfToken) setCsrfToken(csrfToken);
@@ -176,6 +181,7 @@ export function AuthProvider({ children }) {
         _id: authUser._id || authUser.id,
         id: authUser.id || authUser._id,
         accessToken,
+        refreshToken: refreshToken || null,
       };
 
       setUser(normalized);

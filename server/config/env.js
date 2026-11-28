@@ -60,8 +60,8 @@ function validateEnv() {
     cookieSecret: process.env.COOKIE_SECRET || null,
     csrfSecret: process.env.CSRF_SECRET || null,
     cookieDomain: process.env.COOKIE_DOMAIN || undefined,
-    cookieTopology: process.env.COOKIE_TOPOLOGY || (nodeEnv === "production" ? "same-site" : "same-origin"),
-    crossSiteCookies: process.env.CROSS_SITE_COOKIES === "true",
+    cookieTopology: process.env.COOKIE_TOPOLOGY || (nodeEnv === "production" ? (process.env.COOKIE_DOMAIN ? "same-site" : "cross-site") : "same-origin"),
+    crossSiteCookies: process.env.CROSS_SITE_COOKIES === "true" || (nodeEnv === "production" && !process.env.COOKIE_DOMAIN),
     trustProxy: process.env.TRUST_PROXY !== undefined ? (
       process.env.TRUST_PROXY === "true" ? true :
       process.env.TRUST_PROXY === "false" ? false :

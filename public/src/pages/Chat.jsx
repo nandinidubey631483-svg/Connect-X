@@ -132,6 +132,13 @@ export default function Chat({ initialTab }) {
       };
 
       sock.on("message:receive", handleGlobalReceive);
+      sock.on("msg-recieve", (msg) => {
+        const text = typeof msg === "object" ? (msg.msg || msg.message || msg.text) : msg;
+        const sender = typeof msg === "object" ? String(msg.from || msg.sender || "") : "";
+        if (text) {
+          handleGlobalReceive({ sender, message: text });
+        }
+      });
 
       return () => {
         clearInterval(hbInterval);

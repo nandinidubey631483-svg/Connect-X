@@ -149,6 +149,7 @@ async function register(req, res, next) {
     return res.status(201).json({
       success: true,
       accessToken,
+      refreshToken: rawToken,
       csrfToken,
       user: {
         id: user._id,
@@ -250,6 +251,7 @@ async function login(req, res, next) {
     return res.status(200).json({
       success: true,
       accessToken,
+      refreshToken: rawToken,
       csrfToken,
       user: {
         id: user._id,
@@ -507,6 +509,7 @@ async function refresh(req, res, next) {
     return res.status(200).json({
       success: true,
       accessToken,
+      refreshToken: nextRawToken,
       csrfToken,
     });
   } catch (err) {

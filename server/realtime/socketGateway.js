@@ -317,7 +317,7 @@ function initSocketGateway(server, options = {}) {
                 type: "MESSAGE_RECEIVED",
                 title: "New Message",
                 body: preview.length > 100 ? `${preview.substring(0, 97)}...` : preview,
-                conversationId: conversation._id,
+                conversationId: conv ? conv._id : null,
                 messageId: savedMsg._id,
                 dedupKey: `msg:${savedMsg._id}`,
                 io,

@@ -180,10 +180,19 @@ apiClient.interceptors.response.use(
         headers["X-CSRF-Token"] = currentCsrf;
       }
 
+      let savedRefreshToken = null;
+      try {
+        const stored = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY || "chat-app-current-user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          savedRefreshToken = parsed?.refreshToken || null;
+        }
+      } catch (_) {}
+
       // Execute refresh via bare un-intercepted axios call
       const refreshResponse = await axios.post(
         v1RefreshRoute,
-        {},
+        savedRefreshToken ? { refreshToken: savedRefreshToken } : {},
         {
           baseURL,
           withCredentials: true,
@@ -191,7 +200,7 @@ apiClient.interceptors.response.use(
         }
       );
 
-      const { accessToken: newAccessToken, csrfToken: newCsrfToken } = refreshResponse.data || {};
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken, csrfToken: newCsrfToken } = refreshResponse.data || {};
 
       if (!newAccessToken) {
         throw new Error("No access token returned from refresh endpoint");
@@ -202,6 +211,17 @@ apiClient.interceptors.response.use(
       if (newCsrfToken) {
         setCsrfToken(newCsrfToken);
       }
+
+      // Update stored tokens in localStorage
+      try {
+        const stored = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY || "chat-app-current-user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          parsed.accessToken = newAccessToken;
+          if (newRefreshToken) parsed.refreshToken = newRefreshToken;
+          localStorage.setItem(process.env.REACT_APP_LOCALHOST_KEY || "chat-app-current-user", JSON.stringify(parsed));
+        }
+      } catch (_) {}
 
       // Update default authorization header
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
