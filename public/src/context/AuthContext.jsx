@@ -67,12 +67,13 @@ export function AuthProvider({ children }) {
           } catch (_) {}
         }
 
+        const csrfToken = getCsrfToken();
         const refreshRes = await axios.post(
           v1RefreshRoute,
           savedRefreshToken ? { refreshToken: savedRefreshToken } : {},
           {
             withCredentials: true,
-            headers,
+            headers: csrfToken ? { "X-CSRF-Token": csrfToken } : {},
           }
         );
 
@@ -250,5 +251,7 @@ export function useAuthContext() {
   }
   return context;
 }
+
+export const useAuth = useAuthContext;
 
 export default AuthContext;

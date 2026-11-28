@@ -247,6 +247,52 @@ async function sendViaResend({ to, subject, html, text }) {
 }
 
 /**
+ * Sends an email via Brevo (Sendinblue) HTTPS REST API (Port 443).
+ * Supports sending emails to all domains/recipients for free without requiring a custom domain.
+ */
+async function sendViaBrevo({ to, subject, html, text }) {
+  const apiKey = config.brevoApiKey || process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY is not configured.");
+  }
+
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || "noreply.connectx@gmail.com";
+  const recipients = (Array.isArray(to) ? to : [to]).map((email) => ({ email }));
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "ConnectX Security", email: senderEmail },
+      to: recipients,
+      subject,
+      htmlContent: html,
+      textContent: text,
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const errorMsg = data.message || `Brevo API returned status ${response.status}`;
+    const err = new Error(errorMsg);
+    err.statusCode = response.status;
+    err.data = data;
+    throw err;
+  }
+
+  return {
+    success: true,
+    messageId: data.messageId,
+    provider: "brevo",
+  };
+}
+
+/**
  * Dispatches an OTP email to the destination address.
  * 
  * @param {Object} options
@@ -277,21 +323,29 @@ async function sendOtpEmail({ to, code, purpose = "SIGNUP" }) {
     }
 
     // 2. Automated test environment fallback (when real providers not configured during test runs)
+    const hasBrevo = Boolean(config.brevoApiKey || process.env.BREVO_API_KEY);
     const hasResend = Boolean(config.resendApiKey || process.env.RESEND_API_KEY);
     const isSmtpConfigured = config.smtp && config.smtp.isConfigured;
-    if (!hasResend && !isSmtpConfigured && isTestEnvironment()) {
+    if (!hasBrevo && !hasResend && !isSmtpConfigured && isTestEnvironment()) {
       lastDispatchedEmail = { to, subject, code, html, text, purpose, timestamp: new Date() };
       return { success: true, messageId: `test_msg_${Date.now()}` };
     }
 
-    // 3. Primary cloud delivery: Resend HTTPS API (works on Render port 443)
+    // 3. Primary cloud delivery: Brevo HTTPS API (sends to any recipient for free)
+    if (hasBrevo) {
+      const res = await sendViaBrevo({ to, subject, html, text });
+      lastDispatchedEmail = { to, subject, code, purpose, timestamp: new Date(), messageId: res.messageId, provider: "brevo" };
+      return res;
+    }
+
+    // 4. Secondary cloud delivery: Resend HTTPS API (works on Render port 443)
     if (hasResend) {
       const res = await sendViaResend({ to, subject, html, text });
       lastDispatchedEmail = { to, subject, code, purpose, timestamp: new Date(), messageId: res.messageId, provider: "resend" };
       return res;
     }
 
-    // 4. Live SMTP delivery via Nodemailer
+    // 5. Live SMTP delivery via Nodemailer
     if (isSmtpConfigured) {
       const transporter = getTransporter();
       if (!transporter) {

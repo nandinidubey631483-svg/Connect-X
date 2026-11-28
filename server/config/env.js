@@ -74,6 +74,7 @@ function validateEnv() {
       username: process.env.TURN_USERNAME || null,
       credential: process.env.TURN_CREDENTIAL || null,
     },
+    brevoApiKey: process.env.BREVO_API_KEY || null,
     resendApiKey: process.env.RESEND_API_KEY || null,
     emailFrom: process.env.EMAIL_FROM || "ConnectX <onboarding@resend.dev>",
     smtp: {

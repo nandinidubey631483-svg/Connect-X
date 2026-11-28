@@ -36,10 +36,7 @@ export default function ChatContainer({
   onBackToSidebar: propOnBackToSidebar,
 }) {
   const { isMobile } = useMediaQuery();
-  let chatContext = null;
-  try {
-    chatContext = useChat();
-  } catch (_) {}
+  const chatContext = useChat();
 
   const currentChat = propChat || chatContext?.currentChat;
   const socket = propSocket || chatContext?.socket;
@@ -290,17 +287,6 @@ export default function ChatContainer({
       activeSocket.off("message:read", handleStatusUpdate);
     };
   }, [socket, currentChat]);
-
-  // Synchronize incoming arrival messages
-  useEffect(() => {
-    if (arrivalMessage) {
-      setMessages((prev) => {
-        const alreadyExists = prev.some((m) => m._id === arrivalMessage._id);
-        if (alreadyExists) return prev;
-        return [...prev, arrivalMessage];
-      });
-    }
-  }, [arrivalMessage]);
 
   // Autoscroll to bottom
   useEffect(() => {
@@ -628,14 +614,6 @@ export default function ChatContainer({
               }}
             >
               <FiSidebar size={isMobile ? 14 : 16} />
-            </button>
-          </div>
-                border: "1px solid var(--line)",
-                background: isDetailsOpen ? "var(--acc2, #FBF3EF)" : "transparent",
-                color: isDetailsOpen ? "var(--acc, #D98B70)" : "var(--mut)",
-              }}
-            >
-              <FiSidebar size={16} />
             </button>
           </div>
         </div>
