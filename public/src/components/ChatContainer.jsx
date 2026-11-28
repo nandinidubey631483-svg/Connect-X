@@ -14,6 +14,8 @@ import apiClient from "../services/apiClient";
 import Avatar from "./common/Avatar";
 import DoodleBg from "../assets/doodle_pattern.svg";
 import { useCall } from "../context/CallContext";
+import { useChat } from "../context/ChatContext";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import {
   FiDownload,
   FiFileText,
@@ -28,13 +30,31 @@ import {
   FiFolder,
 } from "react-icons/fi";
 
-export default function ChatContainer({ currentChat, socket, onBackToSidebar }) {
+export default function ChatContainer({
+  currentChat: propChat,
+  socket: propSocket,
+  onBackToSidebar: propOnBackToSidebar,
+}) {
+  const { isMobile } = useMediaQuery();
+  let chatContext = null;
+  try {
+    chatContext = useChat();
+  } catch (_) {}
+
+  const currentChat = propChat || chatContext?.currentChat;
+  const socket = propSocket || chatContext?.socket;
+  const onBackToSidebar = propOnBackToSidebar || chatContext?.closeChat;
+
   const { startVoiceCall, startVideoCall } = useCall();
-  const [messages, setMessages] = useState([]);
+  const [localMessages, setLocalMessages] = useState([]);
   const scrollRef = useRef();
-  const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [localIsDetailsOpen, setLocalIsDetailsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+
+  const isDetailsOpen = chatContext ? chatContext.isDetailsOpen : localIsDetailsOpen;
+  const setIsDetailsOpen = chatContext ? chatContext.setIsDetailsOpen : setLocalIsDetailsOpen;
+  const messages = (chatContext?.messages && chatContext.messages.length > 0) ? chatContext.messages : localMessages;
+  const setMessages = chatContext?.setMessages || setLocalMessages;
 
   // Load message history
   useEffect(() => {
@@ -82,6 +102,11 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
 
   // Handle sending new messages
   const handleSendMsg = async (msg, mediaPayload) => {
+    if (chatContext?.sendMessage) {
+      await chatContext.sendMessage(msg, mediaPayload);
+      return;
+    }
+
     const data = await JSON.parse(
       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
     );
@@ -507,7 +532,7 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 20px",
+            padding: isMobile ? "0 10px" : "0 20px",
             borderBottom: "1px solid var(--line)",
             background: "color-mix(in srgb, var(--surf) 85%, transparent)",
             backdropFilter: "blur(14px)",
@@ -516,48 +541,48 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
             zIndex: 2,
           }}
         >
-          <div className="user-details" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {onBackToSidebar && (
+          <div className="user-details" style={{ display: "flex", alignItems: "center", gap: isMobile ? "8px" : "12px", minWidth: 0, overflow: "hidden" }}>
+            {(onBackToSidebar || isMobile) && (
               <button
                 type="button"
                 className="btn ic bk"
                 onClick={onBackToSidebar}
-                style={{ width: "32px", height: "32px", borderRadius: "8px", display: "grid", placeItems: "center" }}
+                style={{ width: "32px", height: "32px", borderRadius: "8px", display: "grid", placeItems: "center", flexShrink: 0 }}
               >
                 ←
               </button>
             )}
 
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", flexShrink: 0 }}>
               <Avatar
-                image={currentChat.avatarImage}
-                name={currentChat.displayName || currentChat.username}
+                image={currentChat?.avatarImage}
+                name={currentChat?.displayName || currentChat?.username}
                 size="md"
-                isOnline={currentChat.isOnline}
+                isOnline={currentChat?.isOnline}
                 showStatus={true}
               />
             </div>
 
-            <div className="username">
-              <h3 style={{ fontSize: "15px", fontWeight: "600", margin: 0, color: "var(--ink)" }}>
-                {currentChat.displayName || currentChat.username}
+            <div className="username" style={{ minWidth: 0, overflow: "hidden", maxWidth: isMobile ? "calc(100vw - 190px)" : "260px" }}>
+              <h3 style={{ fontSize: isMobile ? "14px" : "15px", fontWeight: "600", margin: 0, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {currentChat?.displayName || currentChat?.username}
               </h3>
-              <p className="status-text sm mut" style={{ margin: "1px 0 0" }}>
-                {currentChat.isOnline ? "Active now" : "Offline"}
+              <p className="status-text sm mut" style={{ margin: "1px 0 0", fontSize: "11px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {currentChat?.isOnline ? "Active now" : "Offline"}
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "4px" : "6px", flexShrink: 0 }}>
             <button
               type="button"
               className="btn ic"
               title="Voice call"
               data-testid="header-voice-call-btn"
               onClick={() => startVoiceCall && startVoiceCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
-              style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
+              style={{ width: isMobile ? "32px" : "36px", height: isMobile ? "32px" : "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
             >
-              <FiPhone size={16} />
+              <FiPhone size={isMobile ? 14 : 16} />
             </button>
             <button
               type="button"
@@ -565,11 +590,23 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
               title="Video call"
               data-testid="header-video-call-btn"
               onClick={() => startVideoCall && startVideoCall(currentChat, currentChat?.conversationId, socket?.current || socket)}
-              style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
+              style={{ width: isMobile ? "32px" : "36px", height: isMobile ? "32px" : "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)", cursor: "pointer" }}
             >
-              <FiVideo size={16} />
+              <FiVideo size={isMobile ? 14 : 16} />
             </button>
-            <button type="button" className="btn ic" title="Search messages" style={{ width: "36px", height: "36px", borderRadius: "10px", display: "grid", placeItems: "center", border: "1px solid var(--line)" }}>
+            <button
+              type="button"
+              className="btn ic"
+              title="Search messages"
+              style={{
+                width: isMobile ? "32px" : "36px",
+                height: isMobile ? "32px" : "36px",
+                borderRadius: "10px",
+                display: isMobile ? "none" : "grid",
+                placeItems: "center",
+                border: "1px solid var(--line)",
+              }}
+            >
               <FiSearch size={16} />
             </button>
             <button
@@ -578,11 +615,21 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
               title="Conversation details"
               onClick={() => setIsDetailsOpen(!isDetailsOpen)}
               style={{
-                width: "36px",
-                height: "36px",
+                width: isMobile ? "32px" : "36px",
+                height: isMobile ? "32px" : "36px",
                 borderRadius: "10px",
                 display: "grid",
                 placeItems: "center",
+                border: "1px solid var(--line)",
+                cursor: "pointer",
+                background: isDetailsOpen ? "var(--acc2, #FBF3EF)" : "transparent",
+                color: isDetailsOpen ? "var(--acc, #D98B70)" : "var(--mut)",
+                transition: "0.15s ease",
+              }}
+            >
+              <FiSidebar size={isMobile ? 14 : 16} />
+            </button>
+          </div>
                 border: "1px solid var(--line)",
                 background: isDetailsOpen ? "var(--acc2, #FBF3EF)" : "transparent",
                 color: isDetailsOpen ? "var(--acc, #D98B70)" : "var(--mut)",
@@ -753,8 +800,14 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
         <aside
           className="dp user-details-drawer"
           style={{
-            width: "340px",
-            borderLeft: "1px solid var(--line)",
+            position: isMobile ? "fixed" : "relative",
+            top: 0,
+            left: isMobile ? 0 : "auto",
+            right: 0,
+            bottom: 0,
+            width: isMobile ? "100%" : "340px",
+            maxWidth: "100vw",
+            borderLeft: isMobile ? "none" : "1px solid var(--line)",
             background: "var(--surf)",
             height: "100%",
             overflowY: "auto",
@@ -762,8 +815,8 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
             flexDirection: "column",
             padding: "0",
             flexShrink: 0,
-            boxShadow: "-4px 0 24px rgba(0,0,0,0.04)",
-            zIndex: 10,
+            boxShadow: isMobile ? "none" : "-4px 0 24px rgba(0,0,0,0.04)",
+            zIndex: isMobile ? 100 : 10,
           }}
         >
           {/* Top Bar with Title and Close Button */}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FiPlus, FiMessageSquare } from "react-icons/fi";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Sidebar({
   contacts = [],
@@ -9,6 +10,7 @@ export default function Sidebar({
   onOpenDiscovery,
   className,
 }) {
+  const { isMobile } = useMediaQuery();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'unread' | 'online'
 
@@ -54,7 +56,19 @@ export default function Sidebar({
   };
 
   return (
-    <aside className={`list lp ${className || ""}`} style={{ width: "330px", background: "var(--surf)", display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+    <aside
+      className={`list lp ${className || ""}`}
+      style={{
+        width: isMobile ? "100%" : "330px",
+        maxWidth: "100%",
+        background: "var(--surf)",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        overflow: "hidden",
+        paddingBottom: isMobile ? "68px" : "0",
+      }}
+    >
       {/* Header */}
       <div className="lh" style={{ padding: "16px 18px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <h3 className="serif" style={{ fontSize: "20px", fontWeight: "600", letterSpacing: "-0.02em" }}>

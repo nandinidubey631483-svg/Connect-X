@@ -127,8 +127,9 @@ export default function MainLayout({
       className={`tr ${isMobile && currentChat ? "in" : ""}`}
       style={{
         display: "flex",
-        height: "100vh",
-        width: "100vw",
+        height: isMobile ? "100dvh" : "100vh",
+        width: "100%",
+        maxWidth: "100vw",
         overflow: "hidden",
         backgroundColor: "var(--bg-wallpaper, #ECE7DE)",
         backgroundImage: `url(${DoodleBg})`,
@@ -493,12 +494,14 @@ export default function MainLayout({
 
       {/* MOBILE HEADER/SIDEBAR (When on mobile) */}
       {isMobile && !currentChat && !isPageMode && (
-        <Sidebar
-          contacts={contacts}
-          currentChat={currentChat}
-          onSelectChat={handleSelectChat}
-          onOpenDiscovery={() => handleTabChange("people")}
-        />
+        <div style={{ width: "100%", maxWidth: "100vw", height: "100dvh", overflow: "hidden" }}>
+          <Sidebar
+            contacts={contacts}
+            currentChat={currentChat}
+            onSelectChat={handleSelectChat}
+            onOpenDiscovery={() => handleTabChange("people")}
+          />
+        </div>
       )}
 
       {/* MAIN RIGHT CONTAINER */}
@@ -555,10 +558,17 @@ export default function MainLayout({
           style={{
             flex: 1,
             minWidth: 0,
-            height: "100%",
+            width: isMobile ? "100%" : "auto",
+            maxWidth: isMobile ? "100vw" : "none",
+            height: isMobile ? "100dvh" : "100%",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
+            margin: isMobile ? 0 : "12px 12px 12px 0",
+            borderRadius: isMobile ? 0 : "20px",
+            background: isMobile ? "var(--surf, #FFFFFF)" : "transparent",
+            boxShadow: isMobile ? "none" : "0 8px 30px rgba(0, 0, 0, 0.07)",
+            border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.08)",
           }}
         >
           {React.isValidElement(children)

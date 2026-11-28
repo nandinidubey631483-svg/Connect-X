@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
+import { ChatProvider } from "./context/ChatContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
 import SessionExpiryBanner from "./components/common/SessionExpiryBanner";
@@ -17,9 +18,10 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <NetworkStatusBanner />
-          <SessionExpiryBanner />
-          <BrowserRouter>
+          <ChatProvider>
+            <NetworkStatusBanner />
+            <SessionExpiryBanner />
+            <BrowserRouter>
             <Routes>
               {/* Guest-only routes: redirect to / if already authenticated */}
               <Route
@@ -106,6 +108,7 @@ export default function App() {
               />
             </Routes>
           </BrowserRouter>
+          </ChatProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

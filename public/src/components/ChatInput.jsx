@@ -3,10 +3,12 @@ import Picker from "emoji-picker-react";
 import { FiPaperclip, FiSmile, FiSend, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { validateFileUpload } from "../utils/validators";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const QUICK_REPLIES = ["Sounds good! 👍", "On my way 🚀", "Let's sync later today."];
 
 export default function ChatInput({ handleSendMsg }) {
+  const { isMobile } = useMediaQuery();
   const [msg, setMsg] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -67,23 +69,37 @@ export default function ChatInput({ handleSendMsg }) {
   };
 
   return (
-    <div className="comp" style={{ padding: "6px 20px 18px", position: "relative" }}>
+    <div className="comp" style={{ padding: isMobile ? "4px 10px 12px" : "6px 20px 18px", position: "relative" }}>
       {/* Quick Reply Chips (.sr) */}
-      <div className="sr" style={{ display: "flex", gap: "6px", margin: "0 0 9px", flexWrap: "wrap", alignItems: "center" }}>
+      <div
+        className="sr"
+        style={{
+          display: "flex",
+          gap: "6px",
+          margin: "0 0 8px",
+          overflowX: "auto",
+          whiteSpace: "nowrap",
+          paddingBottom: "3px",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+        }}
+      >
         {QUICK_REPLIES.map((reply, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => handleQuickReply(reply)}
             style={{
-              padding: "5px 12px",
+              flexShrink: 0,
+              padding: isMobile ? "4px 10px" : "5px 12px",
               borderRadius: "99px",
               border: "1px solid var(--line)",
               background: "var(--surf)",
-              fontSize: "12.5px",
+              fontSize: isMobile ? "11.5px" : "12.5px",
               color: "var(--mut)",
               transition: "0.15s",
               cursor: "pointer",
+              whiteSpace: "nowrap",
             }}
           >
             {reply}
@@ -134,15 +150,19 @@ export default function ChatInput({ handleSendMsg }) {
           className="pop em"
           style={{
             position: "absolute",
-            bottom: "82px",
-            left: "20px",
+            bottom: isMobile ? "72px" : "82px",
+            left: isMobile ? "10px" : "20px",
+            right: isMobile ? "10px" : "auto",
+            maxWidth: isMobile ? "calc(100vw - 20px)" : "350px",
             zIndex: 10,
             boxShadow: "var(--sh)",
             borderRadius: "16px",
             overflow: "hidden",
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <Picker onEmojiClick={handleEmojiClick} theme="dark" />
+          <Picker onEmojiClick={handleEmojiClick} theme="dark" width="100%" />
         </div>
       )}
 
