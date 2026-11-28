@@ -218,9 +218,14 @@ export default function Chat({ initialTab }) {
 
   const handleChatChange = async (chat) => {
     setCurrentChat(chat);
-    if (chat && chat._id) {
+    if (chat && (chat._id || chat.id)) {
       try {
-        await apiClient.post(v1CreateConversationRoute, { participantId: chat._id });
+        const targetId = chat._id || chat.id;
+        const convRes = await apiClient.post(v1CreateConversationRoute, { participantId: targetId });
+        if (convRes.data?.conversation?._id) {
+          const convId = convRes.data.conversation._id;
+          setCurrentChat((prev) => (prev ? { ...prev, conversationId: convId } : prev));
+        }
       } catch (_) { }
     }
   };

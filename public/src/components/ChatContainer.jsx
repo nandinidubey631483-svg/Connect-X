@@ -151,24 +151,36 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
     if (!activeSocket || typeof activeSocket.on !== "function") return;
 
     const handleReceiveV1 = (payload) => {
-      const sender = String(payload?.sender || payload?.from || "");
+      const sender = String(
+        payload?.sender?._id || payload?.sender?.id || payload?.sender || payload?.from || ""
+      );
       const chatTarget = String(currentChat?._id || currentChat?.id || "");
       const currentConvId = String(currentChat?.conversationId || "");
       const incomingConvId = String(payload?.conversationId || "");
+      const chatTargetUsername = String(currentChat?.username || "").toLowerCase();
+      const incomingUsername = String(payload?.sender?.username || payload?.username || "").toLowerCase();
 
       const isCurrentConversation =
         (currentConvId && incomingConvId && currentConvId === incomingConvId) ||
-        (!sender || sender === chatTarget);
+        (sender && chatTarget && sender === chatTarget) ||
+        (incomingUsername && chatTargetUsername && incomingUsername === chatTargetUsername) ||
+        (!sender && !incomingConvId);
 
       if (payload && isCurrentConversation) {
         const newMsgId = payload._id || uuidv4();
-        setArrivalMessage({
+        const incomingMsg = {
           _id: newMsgId,
           fromSelf: false,
           message: payload.message || payload.text,
           messageType: payload.messageType || "TEXT",
           media: payload.media || null,
           createdAt: payload.createdAt || new Date().toISOString(),
+        };
+
+        setMessages((prev) => {
+          const alreadyExists = prev.some((m) => m._id === newMsgId);
+          if (alreadyExists) return prev;
+          return [...prev, incomingMsg];
         });
 
         // Automatically acknowledge delivery
@@ -191,12 +203,18 @@ export default function ChatContainer({ currentChat, socket, onBackToSidebar }) 
       const sender = typeof msg === "object" ? String(msg.from || msg.sender || "") : "";
       const chatTarget = String(currentChat?._id || currentChat?.id || "");
       if (!sender || sender === chatTarget) {
-        setArrivalMessage({
-          _id: uuidv4(),
+        const newMsgId = uuidv4();
+        const incomingMsg = {
+          _id: newMsgId,
           fromSelf: false,
           message: textMsg,
           messageType: "TEXT",
           createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => {
+          const alreadyExists = prev.some((m) => m._id === newMsgId);
+          if (alreadyExists) return prev;
+          return [...prev, incomingMsg];
         });
       }
     };
