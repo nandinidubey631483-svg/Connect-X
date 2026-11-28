@@ -202,6 +202,51 @@ ConnectX Platform | Automated Security Notification
 }
 
 /**
+ * Sends an email via Resend HTTPS REST API (Port 443).
+ * Works reliably on cloud environments like Render where outbound SMTP ports are blocked.
+ */
+async function sendViaResend({ to, subject, html, text }) {
+  const apiKey = config.resendApiKey || process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not configured.");
+  }
+
+  const from = config.emailFrom || "ConnectX <onboarding@resend.dev>";
+  const recipients = Array.isArray(to) ? to : [to];
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: recipients,
+      subject,
+      html,
+      text,
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const errorMsg = data.message || `Resend API returned status ${response.status}`;
+    const err = new Error(errorMsg);
+    err.statusCode = response.status;
+    err.data = data;
+    throw err;
+  }
+
+  return {
+    success: true,
+    messageId: data.id,
+    provider: "resend",
+  };
+}
+
+/**
  * Dispatches an OTP email to the destination address.
  * 
  * @param {Object} options
@@ -231,59 +276,67 @@ async function sendOtpEmail({ to, code, purpose = "SIGNUP" }) {
       return { success: true, messageId: res ? res.messageId || "mock_msg_id" : "mock_msg_id" };
     }
 
-    // 2. Automated test environment fallback (when real SMTP not configured during test runs)
+    // 2. Automated test environment fallback (when real providers not configured during test runs)
+    const hasResend = Boolean(config.resendApiKey || process.env.RESEND_API_KEY);
     const isSmtpConfigured = config.smtp && config.smtp.isConfigured;
-    if (!isSmtpConfigured && isTestEnvironment()) {
+    if (!hasResend && !isSmtpConfigured && isTestEnvironment()) {
       lastDispatchedEmail = { to, subject, code, html, text, purpose, timestamp: new Date() };
       return { success: true, messageId: `test_msg_${Date.now()}` };
     }
 
-    // 3. In production or normal runtime without SMTP credentials configured, fail closed
-    if (!isSmtpConfigured) {
-      throw new AppError(
-        "Email delivery service is currently not configured on this server. Please configure SMTP credentials in your .env file.",
-        503,
-        "SMTP_NOT_CONFIGURED"
-      );
+    // 3. Primary cloud delivery: Resend HTTPS API (works on Render port 443)
+    if (hasResend) {
+      const res = await sendViaResend({ to, subject, html, text });
+      lastDispatchedEmail = { to, subject, code, purpose, timestamp: new Date(), messageId: res.messageId, provider: "resend" };
+      return res;
     }
 
     // 4. Live SMTP delivery via Nodemailer
-    const transporter = getTransporter();
-    if (!transporter) {
-      throw new AppError(
-        "Email transporter initialization failed. Please verify SMTP host and credentials.",
-        500,
-        "SMTP_INIT_ERROR"
-      );
+    if (isSmtpConfigured) {
+      const transporter = getTransporter();
+      if (!transporter) {
+        throw new AppError(
+          "Email transporter initialization failed. Please verify SMTP host and credentials.",
+          500,
+          "SMTP_INIT_ERROR"
+        );
+      }
+
+      const info = await transporter.sendMail({
+        from: config.smtp.from,
+        to,
+        subject,
+        text,
+        html,
+      });
+
+      lastDispatchedEmail = { to, subject, code, purpose, timestamp: new Date(), messageId: info.messageId, provider: "smtp" };
+
+      return {
+        success: true,
+        messageId: info.messageId,
+        accepted: info.accepted,
+      };
     }
 
-    const info = await transporter.sendMail({
-      from: config.smtp.from,
-      to,
-      subject,
-      text,
-      html,
-    });
-
-    lastDispatchedEmail = { to, subject, code, purpose, timestamp: new Date(), messageId: info.messageId };
-
-    return {
-      success: true,
-      messageId: info.messageId,
-      accepted: info.accepted,
-    };
+    // 5. In production or normal runtime without any email credentials configured, fail closed
+    throw new AppError(
+      "Email delivery service is currently not configured on this server. Please configure RESEND_API_KEY or SMTP credentials in your .env file.",
+      503,
+      "EMAIL_SERVICE_NOT_CONFIGURED"
+    );
   } catch (err) {
     if (err instanceof AppError) {
       throw err;
     }
 
     // Log failure without leaking auth tokens or passwords
-    console.error(`[EmailService] Failed to deliver OTP email to ${to}:`, err.code || err.message);
+    console.error(`[EmailService] Failed to deliver OTP email to ${to}:`, err.message || err.code);
     throw new AppError(
-      "Failed to deliver verification email. Please check your email address or try again later.",
+      err.message || "Failed to deliver verification email. Please check your email address or try again later.",
       502,
       "EMAIL_DELIVERY_FAILED",
-      { originalCode: err.code || "SMTP_ERROR" }
+      { originalCode: err.code || "EMAIL_ERROR", details: err.message }
     );
   }
 }
@@ -323,6 +376,7 @@ function clearLastDispatchedEmail() {
 
 module.exports = {
   sendOtpEmail,
+  sendViaResend,
   verifySmtpConnection,
   getTransporter,
   setMockTransporter,

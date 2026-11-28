@@ -112,4 +112,36 @@ describe("Email Delivery Service Tests", () => {
       }
     );
   });
+
+  test("sendViaResend dispatches correctly to Resend API endpoint", async () => {
+    const originalFetch = global.fetch;
+    let fetchCalledWith = null;
+
+    global.fetch = async (url, options) => {
+      fetchCalledWith = { url, options, body: JSON.parse(options.body) };
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ id: "resend_msg_test_999" }),
+      };
+    };
+
+    try {
+      const res = await emailService.sendViaResend({
+        to: "recipient@example.com",
+        subject: "Test Subject",
+        html: "<p>Test</p>",
+        text: "Test",
+      });
+
+      assert.strictEqual(res.success, true);
+      assert.strictEqual(res.messageId, "resend_msg_test_999");
+      assert.strictEqual(res.provider, "resend");
+      assert.strictEqual(fetchCalledWith.url, "https://api.resend.com/emails");
+      assert.deepStrictEqual(fetchCalledWith.body.to, ["recipient@example.com"]);
+      assert.strictEqual(fetchCalledWith.body.subject, "Test Subject");
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });

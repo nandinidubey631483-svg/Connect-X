@@ -74,6 +74,8 @@ function validateEnv() {
       username: process.env.TURN_USERNAME || null,
       credential: process.env.TURN_CREDENTIAL || null,
     },
+    resendApiKey: process.env.RESEND_API_KEY || null,
+    emailFrom: process.env.EMAIL_FROM || "ConnectX <onboarding@resend.dev>",
     smtp: {
       host: process.env.SMTP_HOST || (process.env.SMTP_USER?.includes("@gmail.com") ? "smtp.gmail.com" : null),
       port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,

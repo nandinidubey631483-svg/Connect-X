@@ -83,15 +83,23 @@ async function sendOtp(req, res, next) {
       consumed: false,
     });
 
-    // Deliver OTP email via Nodemailer SMTP service
+    // Deliver OTP email via Resend HTTPS or Nodemailer SMTP service
     try {
       await sendOtpEmail({
         to: normalizedEmail,
         code: rawOtp,
         purpose,
       });
+
+      return res.status(200).json({
+        success: true,
+        message: `Verification code sent to ${normalizedEmail}. Please check your inbox.`,
+        cooldown: 30,
+        expiresIn: 600,
+        deliveredVia: "email",
+      });
     } catch (deliveryErr) {
-      console.warn(`[OTP] Email delivery failed or blocked by cloud firewall. Showing OTP on screen for ${normalizedEmail}: [ ${rawOtp} ]`);
+      console.warn(`[OTP] Email delivery failed or blocked (${deliveryErr.message}). Showing OTP on screen for ${normalizedEmail}: [ ${rawOtp} ]`);
       // Fallback: Return the generated OTP so it displays directly on screen for testing/demo
       return res.status(200).json({
         success: true,
@@ -100,17 +108,9 @@ async function sendOtp(req, res, next) {
         fallbackCode: rawOtp,
         cooldown: 30,
         expiresIn: 600,
+        deliveredVia: "screen_fallback",
       });
     }
-
-    return res.status(200).json({
-      success: true,
-      message: `Verification code sent to ${normalizedEmail}.`,
-      otpCode: rawOtp,
-      fallbackCode: rawOtp,
-      cooldown: 30,
-      expiresIn: 600,
-    });
   } catch (err) {
     next(err);
   }

@@ -198,6 +198,9 @@ export default function Register() {
           const code = res.data.otpCode || res.data.fallbackCode;
           setDemoOtp(code);
           toast.success(`Verification code: ${code}`, toastOptions);
+        } else {
+          setDemoOtp("");
+          toast.success(res.data.message || "Verification code sent to your email! Please check your inbox.", toastOptions);
         }
         setStep("otp");
       }
