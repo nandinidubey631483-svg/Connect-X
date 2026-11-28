@@ -43,15 +43,14 @@ export default function ChatContainer({
   const onBackToSidebar = propOnBackToSidebar || chatContext?.closeChat;
 
   const { startVoiceCall, startVideoCall } = useCall();
-  const [localMessages, setLocalMessages] = useState([]);
   const scrollRef = useRef();
   const [localIsDetailsOpen, setLocalIsDetailsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   const isDetailsOpen = chatContext ? chatContext.isDetailsOpen : localIsDetailsOpen;
   const setIsDetailsOpen = chatContext ? chatContext.setIsDetailsOpen : setLocalIsDetailsOpen;
-  const messages = (chatContext?.messages && chatContext.messages.length > 0) ? chatContext.messages : localMessages;
-  const setMessages = chatContext?.setMessages || setLocalMessages;
+  const messages = chatContext?.messages || [];
+  const setMessages = chatContext?.setMessages || (() => {});
 
   // Load message history
   useEffect(() => {
@@ -742,9 +741,11 @@ export default function ChatContainer({
               >
                 <div className="content">
                   {renderMedia(message)}
-                  {message.message && (
+                  {(message.message || message.text) && (
                     <p className="text-body" style={{ margin: 0, whiteSpace: "pre-wrap" }}>
-                      {message.message}
+                      {typeof message.message === "object"
+                        ? (message.message?.text || message.message?.msg)
+                        : (message.message || message.text)}
                     </p>
                   )}
                   <div

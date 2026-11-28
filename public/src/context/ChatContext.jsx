@@ -45,6 +45,11 @@ export function ChatProvider({ children }) {
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  const currentChatRef = useRef(currentChat);
+  useEffect(() => {
+    currentChatRef.current = currentChat;
+  }, [currentChat]);
+
   // ---------------------------------------------------------------------------
   // 1. Socket.IO Lifecycle Management
   // ---------------------------------------------------------------------------
@@ -62,22 +67,30 @@ export function ChatProvider({ children }) {
     const uId = String(currentUser._id || currentUser.id || "");
     if (!uId) return;
 
+    const freshToken = getAccessToken() || currentUser.accessToken || "";
     const sock = io(host, {
-      auth: (cb) => {
-        const freshToken = getAccessToken() || currentUser.accessToken;
-        cb({
-          token: freshToken ? `Bearer ${freshToken}` : "",
-          userId: uId,
-        });
+      auth: {
+        token: freshToken ? `Bearer ${freshToken}` : "",
+        userId: uId,
+      },
+      extraHeaders: freshToken ? {
+        Authorization: `Bearer ${freshToken}`,
+      } : {},
+      query: {
+        userId: uId,
       },
       withCredentials: true,
       transports: ["websocket", "polling"],
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 20,
       reconnectionDelay: 1000,
     });
 
     socketRef.current = sock;
     setSocketInstance(sock);
+
+    if (uId) {
+      sock.emit("add-user", uId);
+    }
 
     sock.on("connect", () => {
       setIsConnected(true);
@@ -369,7 +382,9 @@ export function ChatProvider({ children }) {
       const senderId = String(
         payload?.sender?._id || payload?.sender?.id || payload?.sender || payload?.from || ""
       );
-      const incomingText = payload.message || payload.text || "";
+      const incomingText = typeof payload.message === "object"
+        ? (payload.message?.text || payload.message?.msg || "")
+        : (payload.message || payload.text || payload.msg || "");
       const textPreview =
         incomingText || (payload.media ? (payload.media.mimeType?.startsWith("image/") ? "📷 Photo" : `📎 ${payload.media.filename}`) : "");
 
@@ -377,7 +392,7 @@ export function ChatProvider({ children }) {
       setContacts((prev) =>
         prev.map((c) => {
           const cId = String(c._id || c.id || "");
-          if (cId === senderId) {
+          if (cId === senderId || (payload?.from && cId === String(payload.from))) {
             return {
               ...c,
               lastMessage: {
@@ -393,10 +408,11 @@ export function ChatProvider({ children }) {
       );
 
       // B. If the incoming message belongs to the current open chat, append to messages!
-      const activeChatTarget = String(currentChat?._id || currentChat?.id || "");
-      const activeConvId = String(currentChat?.conversationId || "");
+      const current = currentChatRef.current;
+      const activeChatTarget = String(current?._id || current?.id || "");
+      const activeConvId = String(current?.conversationId || "");
       const incomingConvId = String(payload?.conversationId || "");
-      const chatUsername = String(currentChat?.username || "").toLowerCase();
+      const chatUsername = String(current?.username || "").toLowerCase();
       const senderUsername = String(payload?.sender?.username || payload?.username || "").toLowerCase();
 
       const belongsToActiveChat =
@@ -411,6 +427,7 @@ export function ChatProvider({ children }) {
           _id: newMsgId,
           fromSelf: false,
           message: incomingText,
+          text: incomingText,
           messageType: payload.messageType || (payload.media?.mimeType?.startsWith("image/") ? "IMAGE" : "TEXT"),
           media: payload.media || null,
           createdAt: payload.createdAt || new Date().toISOString(),
@@ -423,7 +440,7 @@ export function ChatProvider({ children }) {
         });
 
         // Acknowledge read/delivered
-        const convId = currentChat?.conversationId || payload.conversationId;
+        const convId = current?.conversationId || payload.conversationId;
         if (payload._id && convId) {
           sock.emit("message:delivered", { messageId: payload._id, conversationId: convId });
           sock.emit("message:read", { messageId: payload._id, conversationId: convId });
@@ -435,7 +452,7 @@ export function ChatProvider({ children }) {
     const handleReceiveLegacy = (msg) => {
       const textMsg = typeof msg === "object" ? (msg.msg || msg.message || msg.text) : msg;
       const sender = typeof msg === "object" ? String(msg.from || msg.sender || "") : "";
-      handleReceiveV1({ from: sender, text: textMsg });
+      handleReceiveV1({ from: sender, sender, text: textMsg, message: textMsg });
     };
 
     // Presence updates
@@ -530,8 +547,10 @@ export function ChatProvider({ children }) {
     socketInstance,
     isConnected,
     contacts,
+    setContacts,
     currentChat,
     messages,
+    setMessages,
     isLoadingMessages,
     unreadNotificationsCount,
     isDetailsOpen,

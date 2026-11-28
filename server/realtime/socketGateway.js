@@ -715,21 +715,34 @@ function initSocketGateway(server, options = {}) {
           msg: data.msg,
         };
 
+        const legacyMsgPayload = {
+          msg: data.msg,
+          message: data.msg,
+          text: data.msg,
+          from: strSender,
+          sender: strSender,
+          to: strTo,
+          createdAt: new Date().toISOString(),
+        };
+
         if (io && typeof io.to === "function") {
           try {
-            io.to(`user:${strTo}`).emit("msg-recieve", payload.msg);
+            io.to(`user:${strTo}`).emit("message:receive", legacyMsgPayload);
+            io.to(`user:${strTo}`).emit("msg-recieve", legacyMsgPayload);
           } catch (_) {}
         }
 
         const recipientSockets = userSockets.get(strTo) || userSockets.get(data.to);
         if (recipientSockets && recipientSockets.size > 0) {
           for (const sockId of recipientSockets) {
-            socket.to(sockId).emit("msg-recieve", payload.msg);
+            socket.to(sockId).emit("message:receive", legacyMsgPayload);
+            socket.to(sockId).emit("msg-recieve", legacyMsgPayload);
           }
         } else {
           const sendUserSocket = onlineUsers.get(strTo) || onlineUsers.get(data.to);
           if (sendUserSocket) {
-            socket.to(sendUserSocket).emit("msg-recieve", payload.msg);
+            socket.to(sendUserSocket).emit("message:receive", legacyMsgPayload);
+            socket.to(sendUserSocket).emit("msg-recieve", legacyMsgPayload);
           }
         }
 
